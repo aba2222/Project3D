@@ -7,6 +7,7 @@
 #include "InputLayout.h"
 #include "ConstantBuffer.h"
 #include "Topology.h"
+#include "Cube.h"
 #include <DirectXMath.h>
 
 class Drawable {
