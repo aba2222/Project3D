@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -167,6 +167,14 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="ExceptionHandle.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="ImguiManager.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -176,6 +184,7 @@
     <ClCompile Include="ProTimer.cpp" />
     <ClCompile Include="Pyramid.cpp" />
     <ClCompile Include="Sampler.cpp" />
+    <ClCompile Include="Sheet.cpp" />
     <ClCompile Include="SkinnedBox.cpp" />
     <ClCompile Include="Surface.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -197,6 +206,15 @@
     <ClInclude Include="DrawableBase.h" />
     <ClInclude Include="ExceptionHandle.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="ImguiManager.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="imgui\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="InputLayout.h" />
@@ -205,10 +223,12 @@
     <ClInclude Include="Melon.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PixelShader.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="ProTimer.h" />
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sampler.h" />
+    <ClInclude Include="Sheet.h" />
     <ClInclude Include="SkinnedBox.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Surface.h" />
@@ -225,6 +245,8 @@
   <ItemGroup>
     <Image Include="..\icon1.ico" />
     <Image Include="images\cube.png" />
+    <Image Include="Images\map1.png" />
+    <Image Include="Images\metro_map.jpg" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorBlendPS.hlsl">

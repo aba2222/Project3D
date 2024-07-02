@@ -1,4 +1,7 @@
 #include "Graphics.h"
+#include"imgui/imgui.h"
+#include"imgui/imgui_impl_win32.h"
+#include"imgui/imgui_impl_dx11.h"
 
 Graphics::Graphics(HWND hWnd) {
 	DXGI_SWAP_CHAIN_DESC sd = {};
@@ -75,9 +78,12 @@ Graphics::Graphics(HWND hWnd) {
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
 	pContext->RSSetViewports(1u, &vp);
+
+	ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
 }
 
 Graphics::~Graphics() {
+	ImGui_ImplDX11_Shutdown();
 	// 恢复所有默认设定
 	if (pContext) {
 		pContext->ClearState();
@@ -85,13 +91,12 @@ Graphics::~Graphics() {
 }
 
 void Graphics::EndFrame() {
-	pSwap->Present(1u, 0u);
-}
+	if (imguiStatus) {
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
 
-void Graphics::ClearBuffer(float red, float green, float blue) noexcept {
-	const float color[] = { red,green,blue,1.0f };
-	pContext->ClearRenderTargetView(pTarget.Get(), color);
-	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	pSwap->Present(1u, 0u);
 }
 
 void Graphics::DrawIndexed(UINT count) {
@@ -100,6 +105,22 @@ void Graphics::DrawIndexed(UINT count) {
 
 void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept {
 	projection = proj;
+}
+
+void Graphics::ImguiSwitch() noexcept {imguiStatus = !imguiStatus;}
+void Graphics::ImguiSwitch(bool status) noexcept {imguiStatus = status;}
+bool Graphics::ImguiStatus() noexcept {return imguiStatus;}
+
+void Graphics::BeginFrame(float r, float g, float b) {
+	if (imguiStatus) {
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	const float color[] = { r,g,b,1.0f };
+	pContext->ClearRenderTargetView(pTarget.Get(), color);
+	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept {

@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "imgui//imgui_impl_win32.h"
 
 Window::WindowClass Window::WindowClass::wndClass;
 
@@ -52,10 +53,13 @@ Window::Window(int width, int height, const char* name)
 	}
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 
+	ImGui_ImplWin32_Init(hWnd);
+
 	pGfx = std::make_unique<Graphics>(hWnd);
 }
 
 Window::~Window() {
+	ImGui_ImplWin32_Shutdown();
 	DestroyWindow(hWnd);
 }
 
@@ -101,6 +105,11 @@ LRESULT CALLBACK Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 }
 
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) {
+		return 1;
+	}
+	const auto& imio = ImGui::GetIO();
+
 	switch (msg) {
 	case WM_CLOSE: {
 			PostQuitMessage(0);
@@ -119,13 +128,19 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
 		break;
-	case WM_CHAR: 
-		kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
+	case WM_CHAR:
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
+		kbd.OnChar(static_cast<unsigned char>(wParam));
 		break;
 
 	case WM_MOUSEMOVE: {
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		POINTS pt MAKEPOINTS(lParam);
 		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height) {
 			mouse.OnMouseMove(pt.x, pt.y);
@@ -146,26 +161,36 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	}
 	case WM_LBUTTONDOWN: {
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		POINTS pt MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONDOWN: {
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		POINTS pt MAKEPOINTS(lParam);
 		mouse.OnRightPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_LBUTTONUP: {
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		POINTS pt MAKEPOINTS(lParam);
 		mouse.OnLeftReleased(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONUP: {
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		POINTS pt MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
 		break;
 	}
 	case WM_MOUSEWHEEL: {
+		// stifle this keyboard message if imgui wants to capture
+		if (imio.WantCaptureKeyboard) break;
 		const POINTS pt MAKEPOINTS(lParam);
 		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		mouse.OnWheelDeltaCarry(pt.x, pt.y, delta);

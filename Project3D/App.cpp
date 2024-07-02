@@ -3,6 +3,9 @@
 #include "Math3D.h"
 #include <memory>
 #include <algorithm>
+#include"imgui/imgui.h"
+#include"imgui/imgui_impl_win32.h"
+#include"imgui/imgui_impl_dx11.h"
 
 
 App::App() 
@@ -20,6 +23,8 @@ App::App()
 				return std::make_unique<Melon>(gfx, rng, adist, ddist, odist, rdist, longdist, latdist);
 			case 3:
 				return std::make_unique<SkinnedBox>(gfx, rng, adist, ddist, odist, rdist);
+			case 4:
+				return std::make_unique<Sheet>(gfx, rng, adist, ddist, odist, rdist);
 			default:
 				assert(false && "你这有问题啊");
 				return {};
@@ -36,7 +41,7 @@ App::App()
 		std::uniform_real_distribution<float> bdist{ 0.4f, 3.0f };
 		std::uniform_int_distribution<int> latdist{ 5, 20 };
 		std::uniform_int_distribution<int> longdist{ 10, 40 };
-		std::uniform_int_distribution<int> typedist{ 0, 3 };
+		std::uniform_int_distribution<int> typedist{ 0, 4 };
 	};
 
 	#ifdef FSP_COUNT
@@ -64,12 +69,28 @@ void App::DoFrame() {
 	std::ostringstream oss;
 	oss << "Time is:" << t << 's';
 	wnd.SetTitle(oss.str());*/
-	auto dt = timer.Mark();
-	wnd.Gfx().ClearBuffer(0.3f, 0.3f, 0.8f);
+	auto dt = timer.Mark() * speed_factor;
+
+	if (wnd.kbd.ReadChar() == 'g') {
+		wnd.Gfx().ImguiSwitch();
+	}
+
+	wnd.Gfx().BeginFrame(0.3f, 0.3f, 0.8f);
 	for (auto& d : drawables) {
 		d->Update(dt);
 		d->Draw(wnd.Gfx());
 	}
+
+	static char buffer[1024];
+	if (wnd.Gfx().ImguiStatus()) {
+		if (ImGui::Begin("Sim speed")) {
+			ImGui::SliderFloat("Speed Factor", &speed_factor, 0.0f, 4.0f);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::InputText("Butts", buffer, sizeof(buffer));
+		}
+		ImGui::End();
+	}
+
 	wnd.Gfx().EndFrame();
 
 	#ifdef FSP_COUNT

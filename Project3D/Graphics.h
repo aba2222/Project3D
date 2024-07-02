@@ -24,12 +24,16 @@ public:
 	Graphics& operator=(const Graphics&) = delete;
 	~Graphics();
 	void EndFrame();
-	void ClearBuffer(float red, float green, float blue) noexcept;
 	void DrawIndexed(UINT indexCount);
 	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+	void ImguiSwitch() noexcept;
+	void ImguiSwitch(bool status) noexcept;
+	bool ImguiStatus() noexcept;
+	void BeginFrame(float r, float g, float b);
 	DirectX::XMMATRIX GetProjection() const noexcept;
 
 private:
+	bool imguiStatus = 1;
 	DirectX::XMMATRIX projection;
 
 	ComPtr<ID3D11Device> pDevice = nullptr;

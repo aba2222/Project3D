@@ -4,10 +4,11 @@
 #include "ProTimer.h"
 #include "Graphics.h"
 #include "Drawable.h"
-#include "Box.h"
+#include "Sheet.h"
 #include "SkinnedBox.h"
 #include "Melon.h"
 #include "Pyramid.h"
+#include "ImguiManager.h"
 //#define FSP_COUNT
 
 class App {
@@ -16,7 +17,9 @@ public:
 	int Go();
 
 private:
+	float speed_factor = 1.0f;
 	void DoFrame();
+	ImguiManager imgui;
 	Window wnd;
 	ProTimer timer;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
