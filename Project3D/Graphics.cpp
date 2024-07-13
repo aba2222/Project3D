@@ -1,7 +1,4 @@
 #include "Graphics.h"
-#include"imgui/imgui.h"
-#include"imgui/imgui_impl_win32.h"
-#include"imgui/imgui_impl_dx11.h"
 
 Graphics::Graphics(HWND hWnd) {
 	DXGI_SWAP_CHAIN_DESC sd = {};
@@ -103,10 +100,6 @@ void Graphics::DrawIndexed(UINT count) {
 	pContext->DrawIndexed(count, 0u, 0u);
 }
 
-void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept {
-	projection = proj;
-}
-
 void Graphics::ImguiSwitch() noexcept {imguiStatus = !imguiStatus;}
 void Graphics::ImguiSwitch(bool status) noexcept {imguiStatus = status;}
 bool Graphics::ImguiStatus() noexcept {return imguiStatus;}
@@ -123,6 +116,7 @@ void Graphics::BeginFrame(float r, float g, float b) {
 	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
-DirectX::XMMATRIX Graphics::GetProjection() const noexcept {
-	return projection;
-}
+DirectX::XMMATRIX Graphics::GetProjection() const noexcept {return projection;}
+DirectX::XMMATRIX Graphics::GetCamera() const noexcept{return camera;}
+void Graphics::SetCamera(DirectX::XMMATRIX cam) noexcept { camera = cam; }
+void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept {projection = proj;}

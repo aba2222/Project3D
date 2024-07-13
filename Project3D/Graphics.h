@@ -8,6 +8,9 @@
 #include <random>
 #include <Windows.h>
 #include <wrl.h>
+#include"imgui/imgui.h"
+#include"imgui/imgui_impl_win32.h"
+#include"imgui/imgui_impl_dx11.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -25,16 +28,19 @@ public:
 	~Graphics();
 	void EndFrame();
 	void DrawIndexed(UINT indexCount);
-	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 	void ImguiSwitch() noexcept;
 	void ImguiSwitch(bool status) noexcept;
 	bool ImguiStatus() noexcept;
 	void BeginFrame(float r, float g, float b);
 	DirectX::XMMATRIX GetProjection() const noexcept;
+	DirectX::XMMATRIX GetCamera() const noexcept;
+	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+	void SetCamera(DirectX::XMMATRIX cam) noexcept;
 
 private:
 	bool imguiStatus = 1;
 	DirectX::XMMATRIX projection;
+	DirectX::XMMATRIX camera;
 
 	ComPtr<ID3D11Device> pDevice = nullptr;
 	ComPtr<IDXGISwapChain> pSwap = nullptr;

@@ -9,6 +9,10 @@
 #include "Melon.h"
 #include "Pyramid.h"
 #include "ImguiManager.h"
+#include "Camera.h"
+#include "PointLight.h"
+#include "Box.h"
+#include "Math3D.h"
 //#define FSP_COUNT
 
 class App {
@@ -22,6 +26,8 @@ private:
 	ImguiManager imgui;
 	Window wnd;
 	ProTimer timer;
+	Camera cam;
+	PointLight light;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
 	static constexpr size_t nDrawbles = 180;
 	#ifdef FSP_COUNT

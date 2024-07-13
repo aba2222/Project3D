@@ -130,7 +130,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_SYSKEYUP:
 		// stifle this keyboard message if imgui wants to capture
 		if (imio.WantCaptureKeyboard) break;
-		kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
+		kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_CHAR:
 		// stifle this keyboard message if imgui wants to capture

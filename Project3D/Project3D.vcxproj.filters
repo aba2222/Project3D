@@ -37,6 +37,30 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{f25e7cd6-3348-4c2e-83d7-f0c225d09be0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\GraphicsBase">
+      <UniqueIdentifier>{54c81131-2ed2-4696-b8d7-a6b9b3a78612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\GraphicsBase">
+      <UniqueIdentifier>{a661f96f-823d-4430-9d45-23edbce7c361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\SimObject">
+      <UniqueIdentifier>{94e505d8-93b7-4a77-8898-30fc9dd43833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\SimObject">
+      <UniqueIdentifier>{1fef6975-92f3-4b79-8d9c-709c876c93be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\SimObject\Physics">
+      <UniqueIdentifier>{5c7b2245-940c-4bcb-ac70-213b2a6d2256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\SimObject\Physics">
+      <UniqueIdentifier>{8aa7cba4-e2ae-4d63-bbd4-4b53a0d0cdfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\SimObject\Control">
+      <UniqueIdentifier>{453a520d-faf4-466a-86de-a0d49198e1e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\SimObject\Control">
+      <UniqueIdentifier>{6c26afa0-d491-494d-abbc-8cc89efba4fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -137,6 +161,24 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_tables.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>源文件\GraphicsBase</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>源文件\GraphicsBase</Filter>
+    </ClCompile>
+    <ClCompile Include="SolidSphere.cpp">
+      <Filter>源文件\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="SimObjectBase.cpp">
+      <Filter>源文件\SimObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjForces.cpp">
+      <Filter>源文件\SimObject\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjControlCom.h.cpp">
+      <Filter>源文件\SimObject\Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -266,6 +308,30 @@
     <ClInclude Include="imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="SolidSphere.h">
+      <Filter>头文件\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>头文件\GraphicsBase</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>头文件\GraphicsBase</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseDrawObject.h">
+      <Filter>头文件\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="SimObjectBase.h">
+      <Filter>头文件\SimObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjForces.h">
+      <Filter>头文件\SimObject\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjControlCom.h">
+      <Filter>头文件\SimObject\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlBase.h">
+      <Filter>头文件\SimObject\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -277,9 +343,6 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="images\cube.png">
-      <Filter>Images</Filter>
-    </Image>
-    <Image Include="Images\metro_map.jpg">
       <Filter>Images</Filter>
     </Image>
     <Image Include="Images\map1.png">
@@ -303,6 +366,30 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="TexturePS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BlendedPhongVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BlendedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>
