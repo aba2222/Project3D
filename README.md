@@ -17,7 +17,7 @@ Project3D 希望成为一飞行模拟程序
 
 ### 2. DirectX部分
 
-采用DirectX11，主程序位于`Graphics.cpp`。
+采用DirectX11，主要部分位于`Graphics.cpp`。
 
 ### 3. SimObject 文件夹（设想中）
 
@@ -27,8 +27,12 @@ Project3D 希望成为一飞行模拟程序
 - `SimObjectBase`：飞行物体的基类，包含对物理、控制和模型显示的综合管理。
 - `ObjForces` 文件夹：包含物理模拟类，如升力、推力、重力和阻力的计
 - `Model` 文件夹：包含模型渲染类，用于显示飞机模型。
-- `Control` 文件夹：包含 `FlightControlComputer` 类的实现。
+- `Control` 文件夹：包含 `ControlBase` 类的实现。
 
 ## 编译和运行
 
 本项目使用Visual Studio 2022进行编写和编译。
+
+## 使用的第三方库
+
+本项目使用了[imgui](https://github.com/ocornut/imgui)和[assimp](https://github.com/assimp/assimp)这两个第三方库。
