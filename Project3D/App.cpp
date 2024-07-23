@@ -4,17 +4,11 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 
 App::App() 
 	: wnd(800, 600, "The Fart Box"),
 	  light(wnd.Gfx()) {
-	Assimp::Importer imp;
-	auto model = imp.ReadFile("Models\\suzanne.obj", aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
-
 	class Factory {
 	public:
 		Factory(Graphics& gfx): gfx(gfx) {}
@@ -58,7 +52,9 @@ App::App()
 
 	Factory f(wnd.Gfx());
 	drawables.reserve(nDrawbles);
-	std::generate_n(std::back_inserter(drawables), nDrawbles, f);
+	//std::generate_n(std::back_inserter(drawables), nDrawbles, f);
+	testObj = std::make_unique<SimObjectBase>(wnd.Gfx(), wnd.kbd, "test", 122.6, 78000);
+	drawables.push_back(testObj->GetModel());
 
 	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 }
@@ -87,6 +83,7 @@ void App::DoFrame() {
 	wnd.Gfx().SetCamera(cam.GetMatrix());
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
 
+	testObj->Update();
 	for (auto& d : drawables) {
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
 		d->Draw(wnd.Gfx());
@@ -103,6 +100,7 @@ void App::DoFrame() {
 
 		cam.SpawnControlWindow();
 		light.SpawnControlWindow();
+		testObj->SpawnControlWindow();
 	}
 
 	wnd.Gfx().EndFrame();

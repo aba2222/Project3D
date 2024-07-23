@@ -166,10 +166,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="AssModel.cpp" />
     <ClCompile Include="Bindable.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ControlBase.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="EngineControl.cpp" />
     <ClCompile Include="ExceptionHandle.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="ImguiManager.cpp" />
@@ -185,7 +188,6 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Melon.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="ObjControlCom.h.cpp" />
     <ClCompile Include="ObjForces.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PointLight.cpp" />
@@ -207,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="AssModel.h" />
     <ClInclude Include="BaseDrawObject.h" />
     <ClInclude Include="Bindable.h" />
     <ClInclude Include="Box.h" />
@@ -217,6 +220,7 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="DrawableBase.h" />
+    <ClInclude Include="EngineControl.h" />
     <ClInclude Include="ExceptionHandle.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="ImguiManager.h" />
@@ -235,7 +239,6 @@
     <ClInclude Include="Math3D.h" />
     <ClInclude Include="Melon.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="ObjControlCom.h" />
     <ClInclude Include="ObjForces.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="Plane.h" />
@@ -404,6 +407,9 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

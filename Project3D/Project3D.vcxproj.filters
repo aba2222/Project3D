@@ -81,9 +81,6 @@
     <ClCompile Include="App.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ProTimer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -177,7 +174,16 @@
     <ClCompile Include="ObjForces.cpp">
       <Filter>源文件\SimObject\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="ObjControlCom.h.cpp">
+    <ClCompile Include="AssModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineControl.cpp">
+      <Filter>源文件\SimObject\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ProTimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlBase.cpp">
       <Filter>源文件\SimObject\Control</Filter>
     </ClCompile>
   </ItemGroup>
@@ -326,10 +332,13 @@
     <ClInclude Include="ObjForces.h">
       <Filter>头文件\SimObject\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="ObjControlCom.h">
+    <ClInclude Include="ControlBase.h">
       <Filter>头文件\SimObject\Control</Filter>
     </ClInclude>
-    <ClInclude Include="ControlBase.h">
+    <ClInclude Include="AssModel.h">
+      <Filter>头文件\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineControl.h">
       <Filter>头文件\SimObject\Control</Filter>
     </ClInclude>
   </ItemGroup>
@@ -392,5 +401,8 @@
     <FxCompile Include="TexturedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>

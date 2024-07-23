@@ -13,6 +13,7 @@
 #include "PointLight.h"
 #include "Box.h"
 #include "Math3D.h"
+#include "SimObjectBase.h"
 //#define FSP_COUNT
 
 class App {
@@ -21,6 +22,7 @@ public:
 	int Go();
 
 private:
+	std::unique_ptr<SimObjectBase> testObj;
 	float speed_factor = 1.0f;
 	void DoFrame();
 	ImguiManager imgui;
