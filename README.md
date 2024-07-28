@@ -13,13 +13,13 @@ Project3D 希望成为一飞行模拟程序
 - `WinMain`：程序入口点。
 - `Window`：负责创建窗口，处理消息。
 - `App` : 启动后的主程序。
-- `KeyBoard` 和 `Mouse`：鼠标键盘。
+- `KeyBoard` 和 `Mouse`：用于处理鼠标和键盘。
 
 ### 2. DirectX部分
 
 采用DirectX11，主要部分位于`Graphics.cpp`。
 
-### 3. SimObject 文件夹（设想中）
+### 3. SimObject 文件夹
 
 包含用于管理和模拟飞行物体的类。
 

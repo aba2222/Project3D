@@ -13,8 +13,10 @@ public:
 	void SetThrust(float thrust);
 	float GetGamma();
 	float GetV();
+	float GetV_Y();
 	float GetVkmh();
 	float GetLift();
+	float GetP();
 		
 private:
 	struct Forces {
@@ -45,7 +47,7 @@ private:
 	float p;
 	/// kg
 	int m;
-	//爬升角度
+	//迎角
 	float gamma;
 	bool OnGround;
 	//时间步长

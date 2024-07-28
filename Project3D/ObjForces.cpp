@@ -3,13 +3,13 @@
 ObjForces::ObjForces(float S, int m) 
 	: S(S),
 	  m(m),
-	  p(1.225),
+	  p(1.225f),
       gamma(0),
       OnGround(1),
 	  dt(0.01667f),
-	  e(0.825),
+	  e(0.825f),
 	  AR(pow(34.1,2)/S),
-	  ru(0.02) {
+	  ru(0.02f) {
 }
 
 void ObjForces::Update() {
@@ -36,6 +36,9 @@ void ObjForces::Update() {
 		acceleration.x = (thrustX - forces.drag - forces.friction) / m;
 		acceleration.y = (thrustY + forces.lift - forces.weight) / m;
 		acceleration.z = 0;
+
+		if (acceleration.y < 0)	V_Y = 0;
+		else V_Y += acceleration.y * dt;
 	}
 	else {
 		acceleration.x = (thrustX - forces.drag) / m;
@@ -43,15 +46,18 @@ void ObjForces::Update() {
 		acceleration.z = 0;
 
 		if (V != 0) { gamma -= acceleration.x / V * 180.0 / PI;  /*更新爬升角度*/ };
+
+		V_Y += acceleration.y * dt;
 	}
 
 	V += acceleration.x * dt;  // 更新速度
-	V_Y += acceleration.y * dt;
 }
 
 void ObjForces::SetMass(int mass) { m = mass; }
 void ObjForces::SetThrust(float thrust) { forces.thrust = thrust; }
 float ObjForces::GetGamma() { return gamma; }
 float ObjForces::GetV() { return V; }
+float ObjForces::GetV_Y() { return V_Y; }
 float ObjForces::GetVkmh() { return V * 3.6; }
 float ObjForces::GetLift() { return forces.lift; }
+float ObjForces::GetP() { return p; }

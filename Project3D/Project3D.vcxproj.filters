@@ -174,9 +174,6 @@
     <ClCompile Include="ObjForces.cpp">
       <Filter>源文件\SimObject\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="AssModel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="EngineControl.cpp">
       <Filter>源文件\SimObject\Control</Filter>
     </ClCompile>
@@ -185,6 +182,15 @@
     </ClCompile>
     <ClCompile Include="ControlBase.cpp">
       <Filter>源文件\SimObject\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlSurfaces.cpp">
+      <Filter>源文件\SimObject\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>源文件\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="AssModel.cpp">
+      <Filter>源文件\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +346,12 @@
     </ClInclude>
     <ClInclude Include="EngineControl.h">
       <Filter>头文件\SimObject\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlSurfaces.h">
+      <Filter>头文件\SimObject\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>头文件\Drawable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

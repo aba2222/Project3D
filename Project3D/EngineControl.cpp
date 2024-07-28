@@ -7,7 +7,7 @@ EngineControl::EngineControl(std::vector<Engine> engVec)
 
 void EngineControl::SpawnControlWindow() {
 	ImGui::SliderInt("t", &status, 0, 100);
-	ImGui::Text("Turst:%.2f",status2);
+	//ImGui::Text("Turst:%.2f",status2);
 }
 
 void EngineControl::Update() {

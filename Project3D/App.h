@@ -14,6 +14,7 @@
 #include "Box.h"
 #include "Math3D.h"
 #include "SimObjectBase.h"
+#include "Terrain.h"
 //#define FSP_COUNT
 
 class App {
@@ -32,6 +33,7 @@ private:
 	PointLight light;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
 	static constexpr size_t nDrawbles = 180;
+	Terrain terr;
 	#ifdef FSP_COUNT
 		ProTimer fspTimer;
 		int fsp;

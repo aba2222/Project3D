@@ -8,7 +8,8 @@
 
 App::App() 
 	: wnd(800, 600, "The Fart Box"),
-	  light(wnd.Gfx()) {
+	  light(wnd.Gfx()),
+	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt"){
 	class Factory {
 	public:
 		Factory(Graphics& gfx): gfx(gfx) {}
@@ -84,6 +85,7 @@ void App::DoFrame() {
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
 
 	testObj->Update();
+	terr.Draw(wnd.Gfx());
 	for (auto& d : drawables) {
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
 		d->Draw(wnd.Gfx());

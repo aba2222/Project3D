@@ -1,5 +1,6 @@
 #include "SimObjectBase.h"
 #include "EngineControl.h"
+#include "ControlSurfaces.h"
 
 SimObjectBase::SimObjectBase(Graphics& gfx, Keyboard& keyBoard, std::string name, float S, int m)
 	: name(name),
@@ -11,6 +12,7 @@ SimObjectBase::SimObjectBase(Graphics& gfx, Keyboard& keyBoard, std::string name
 	engVec.push_back({ 564,2,120000 ,0 });
 	engVec.push_back({ 564,2,120000 ,0 });
 	AddControl(1, std::make_unique<EngineControl>(engVec));
+	AddControl(2, std::make_unique<ControlSurfaces>(S, forces));
 }
 
 SimObjectBase::~SimObjectBase() {}
@@ -30,9 +32,8 @@ void SimObjectBase::Update() {
 void SimObjectBase::SpawnControlWindow() {
 	if (ImGui::Begin("SimObj")) {
 		ImGui::Text("Name: %s   Id: %d", name.c_str(), id);
-		ImGui::Text("V:%.2f km/h", forces.GetVkmh());
-		ImGui::Text("Lift:%.2f N", forces.GetLift());
-		ImGui::Text("M*G:%.2f N", 78000 * 9.81f);
+		ImGui::Text("V_X:%.2f km/h", forces.GetVkmh());
+		ImGui::Text("V_Y:%.2f km/h", forces.GetV_Y() * 3.6);
 
 		for (int i = 1; i <= controls.size(); i++) {
 			controls[i]->SpawnControlWindow();
