@@ -9,8 +9,12 @@ AssModel::AssModel(Graphics& gfx, std::string fileName, DirectX::XMFLOAT3 materi
 		};
 
 		Assimp::Importer imp;
-		const auto pModel = imp.ReadFile(fileName,	aiProcess_Triangulate |	aiProcess_JoinIdenticalVertices);
+		//aiProcess_GenNormals
+		const auto pModel = imp.ReadFile(fileName,	aiProcess_Triangulate |	aiProcess_JoinIdenticalVertices | aiProcess_GenNormals);
+		if (pModel == nullptr) { throw std::runtime_error("Failed to load model: " + fileName); }
 		const auto pMesh = pModel->mMeshes[0];
+		if (pMesh == nullptr) { throw std::runtime_error("Failed to load mesh from model: " + fileName); }
+		if (!pMesh->HasNormals()) { throw std::runtime_error("Model has no normals: " + fileName); }
 
 		std::vector<Vertex> vertices;
 		vertices.reserve(pMesh->mNumVertices);
@@ -67,7 +71,8 @@ AssModel::AssModel(Graphics& gfx, std::string fileName, DirectX::XMFLOAT3 materi
 }
 
 DirectX::XMMATRIX AssModel::GetTransformXM() const noexcept {
-	return DirectX::XMMatrixRotationRollPitchYaw(0.0f, DirectX::XM_PIDIV2, 0.0f) *
+	return DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f) *
+		DirectX::XMMatrixRotationX(-DirectX::XM_PIDIV2) *
 		DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
 

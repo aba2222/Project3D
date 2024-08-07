@@ -7,7 +7,7 @@ DirectX::XMMATRIX Camera::GetMatrix() const noexcept {
 	// 计算相机目标位置
 	const auto forward = DirectX::XMVector3Transform(
 		DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
-		DirectX::XMMatrixRotationRollPitchYaw(pitch, -yaw, roll)
+		DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll)
 	);
 	const auto target = DirectX::XMVectorAdd(pos, forward);
 
@@ -17,6 +17,16 @@ DirectX::XMMATRIX Camera::GetMatrix() const noexcept {
 		target,
 		DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
 	);
+}
+
+DirectX::XMMATRIX Camera::GetProjectionMatrix(float aspectRatio) const noexcept {
+	return DirectX::XMMatrixPerspectiveFovLH(
+		DirectX::XMConvertToRadians(60.0f), // 视场角
+		aspectRatio, // 宽高比
+		0.1f, // 近平面
+		1000.0f // 远平面（确保设置足够大）
+	);
+	DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f);
 }
 
 void Camera::SpawnControlWindow() noexcept {

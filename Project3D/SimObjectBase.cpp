@@ -7,7 +7,7 @@ SimObjectBase::SimObjectBase(Graphics& gfx, Keyboard& keyBoard, std::string name
 	 forces(S, m),
 	 id(0),
      kbd(keyBoard) {
-	model = std::make_unique<AssModel>(gfx, "Models\\test.obj", DirectX::XMFLOAT3{ 1,1,1 },1.0f);
+	model = std::make_unique<AssModel>(gfx, "Models\\320.obj", DirectX::XMFLOAT3{ 1,1,1 },1.0f);
 	std::vector<EngineControl::Engine> engVec;
 	engVec.push_back({ 564,2,120000 ,0 });
 	engVec.push_back({ 564,2,120000 ,0 });

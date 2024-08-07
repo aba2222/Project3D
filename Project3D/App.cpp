@@ -7,7 +7,7 @@
 
 
 App::App() 
-	: wnd(800, 600, "The Fart Box"),
+	: wnd(800, 600, "3D Box"),
 	  light(wnd.Gfx()),
 	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt"){
 	class Factory {
@@ -57,7 +57,7 @@ App::App()
 	testObj = std::make_unique<SimObjectBase>(wnd.Gfx(), wnd.kbd, "test", 122.6, 78000);
 	drawables.push_back(testObj->GetModel());
 
-	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
+	wnd.Gfx().SetProjection(cam.GetProjectionMatrix(4.0f / 3.0f));
 }
 
 int App::Go() {
