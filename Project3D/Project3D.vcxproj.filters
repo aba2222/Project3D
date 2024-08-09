@@ -162,7 +162,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>源文件\GraphicsBase</Filter>
     </ClCompile>
-    <ClCompile Include="PointLight.cpp">
+    <ClCompile Include="Light.cpp">
       <Filter>源文件\GraphicsBase</Filter>
     </ClCompile>
     <ClCompile Include="SolidSphere.cpp">
@@ -326,7 +326,7 @@
     <ClInclude Include="Camera.h">
       <Filter>头文件\GraphicsBase</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
+    <ClInclude Include="Light.h">
       <Filter>头文件\GraphicsBase</Filter>
     </ClInclude>
     <ClInclude Include="BaseDrawObject.h">

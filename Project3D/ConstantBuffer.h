@@ -40,7 +40,17 @@ public:
 		if (GetContext(gfx)->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr) != S_OK) {
 			throw ExceptionHandle(__LINE__, __FILE__);
 		}
+		int a= sizeof(consts);
 		memcpy(msr.pData, &consts, sizeof(consts));
+		GetContext(gfx)->Unmap(pConstantBuffer.Get(), 0u);
+	}
+
+	void Update(Graphics& gfx, const C& consts, int size) {
+		D3D11_MAPPED_SUBRESOURCE msr;
+		if (GetContext(gfx)->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr) != S_OK) {
+			throw ExceptionHandle(__LINE__, __FILE__);
+		}
+		memcpy(msr.pData, &consts, size);
 		GetContext(gfx)->Unmap(pConstantBuffer.Get(), 0u);
 	}
 

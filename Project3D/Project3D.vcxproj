@@ -191,7 +191,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="ObjForces.cpp" />
     <ClCompile Include="PixelShader.cpp" />
-    <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="ProTimer.cpp" />
     <ClCompile Include="Pyramid.cpp" />
     <ClCompile Include="Sampler.cpp" />
@@ -245,7 +245,7 @@
     <ClInclude Include="ObjForces.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="Plane.h" />
-    <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="ProTimer.h" />
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="resource.h" />

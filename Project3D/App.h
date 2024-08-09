@@ -10,7 +10,7 @@
 #include "Pyramid.h"
 #include "ImguiManager.h"
 #include "Camera.h"
-#include "PointLight.h"
+#include "Light.h"
 #include "Box.h"
 #include "Math3D.h"
 #include "SimObjectBase.h"
@@ -30,7 +30,7 @@ private:
 	Window wnd;
 	ProTimer timer;
 	Camera cam;
-	PointLight light;
+	Light light;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
 	static constexpr size_t nDrawbles = 180;
 	Terrain terr;

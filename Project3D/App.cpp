@@ -6,9 +6,9 @@
 #include "imgui/imgui_impl_dx11.h"
 
 
-App::App() 
+App::App()
 	: wnd(800, 600, "3D Box"),
-	  light(wnd.Gfx()),
+	light(wnd.Gfx(), 0),
 	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt"){
 	class Factory {
 	public:
