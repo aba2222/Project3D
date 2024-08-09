@@ -8,7 +8,7 @@
 
 App::App()
 	: wnd(800, 600, "3D Box"),
-	light(wnd.Gfx(), 0),
+	light(wnd.Gfx(), 1),
 	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt"){
 	class Factory {
 	public:
