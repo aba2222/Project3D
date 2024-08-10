@@ -9,14 +9,28 @@ Light::Light(Graphics& gfx, int type, float radius)
 }
 
 void Light::SpawnControlWindow() noexcept {
+	static int selectedItem = 0;
+
 	if (ImGui::Begin("Light")) {
 		ImGui::Text("Position");
-		/*ImGui::SliderFloat("X", &lData.pos.x, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("Y", &lData.pos.y, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("Z", &lData.pos.z, -60.0f, 60.0f, "%.1f");
+
+		if (ImGui::Combo("Combo Box", &selectedItem,
+			[](void* data, int idx, const char** out_text) -> bool {
+				auto* items = static_cast<std::vector<PointLightCBuf>*>(data);
+				if (idx < 0 || idx >= items->size()) return false;
+				*out_text = (*items)[idx].name;
+				return true;
+			},
+			&lights, lights.size())) {
+		}
+
+		ImGui::SliderFloat("X", &lights[selectedItem].pos.x, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("Y", &lights[selectedItem].pos.y, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("Z", &lights[selectedItem].pos.z, -60.0f, 60.0f, "%.1f"); 
+		ImGui::SliderFloat("DI", &lights[selectedItem].diffuseIntensity, 0.0f, 1.0f, "%.1f");
 		if (ImGui::Button("Reset")) {
 			Reset();
-		}*/
+		}
 	}
 	ImGui::End();
 }
@@ -31,7 +45,8 @@ void Light::Reset() noexcept {
 		0.045f,
 		0.0075f,
 		lightType,
-		{0.0f,0.0f,0.0f},
+		"sun",
+		0.0f,
 	});
 }
 

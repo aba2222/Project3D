@@ -23,7 +23,8 @@ private:
 		float attLin;  // Only point
 		float attQuad;  // Only point
 		int lightType;  // Light type: 0 = point 1 = directional
-		float padding3[3]; // 野割
+		char name[8];
+		float padding3; // 野割
 	};
 	int lightType;
 
