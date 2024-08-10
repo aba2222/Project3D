@@ -14,7 +14,7 @@ void Light::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Light")) {
 		ImGui::Text("Position");
 
-		if (ImGui::Combo("Combo Box", &selectedItem,
+		if (ImGui::Combo("Light", &selectedItem,
 			[](void* data, int idx, const char** out_text) -> bool {
 				auto* items = static_cast<std::vector<PointLightCBuf>*>(data);
 				if (idx < 0 || idx >= items->size()) return false;
@@ -40,7 +40,7 @@ void Light::Reset() noexcept {
 		{ 0.0f,8.0f,0.0f } , 0.0f,
 		{ 0.05f,0.05f,0.05f }, 0.0f,
 		{ 1.0f,1.0f,1.0f }, 0.0f,
-		1.0f,
+		0.6f,
 		1.0f,
 		0.045f,
 		0.0075f,

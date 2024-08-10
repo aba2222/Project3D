@@ -8,8 +8,8 @@
 
 App::App()
 	: wnd(800, 600, "3D Box"),
-	light(wnd.Gfx(), 1),
-	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt"){
+	  light(wnd.Gfx(), 1),
+	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt", cam){
 	class Factory {
 	public:
 		Factory(Graphics& gfx): gfx(gfx) {}
@@ -80,11 +80,12 @@ void App::DoFrame() {
 		wnd.Gfx().ImguiSwitch();
 	}
 
-	wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
+	wnd.Gfx().BeginFrame(0.275f, 0.510f, 0.706f);
 	wnd.Gfx().SetCamera(cam.GetMatrix());
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
 
 	testObj->Update();
+	terr.Update(dt);
 	terr.Draw(wnd.Gfx());
 	for (auto& d : drawables) {
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);

@@ -29,6 +29,10 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix(float aspectRatio) const noexcept 
 	DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f);
 }
 
+DirectX::XMFLOAT3 Camera::GetPos() const noexcept {
+	return DirectX::XMFLOAT3(x, y, z);
+}
+
 void Camera::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Camera")) {
 		ImGui::Text("Position");

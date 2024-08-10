@@ -1,9 +1,39 @@
 #include "Terrain.h"
-#define SwapByte(x) (x << 8) | (x >> 8)
+#define SwapByte(x) (x << 8) | ((x >> 8) & 0xFF)
 
-Terrain::Terrain(Graphics& gfx, const std::string& heightmapFile) {
+Terrain::Terrain(Graphics& gfx, const std::string& heightmapFile, Camera& cam) 
+    : cam(cam),
+      gfx(gfx) {
     LoadHeightmap(heightmapFile);
-    CreateTerrainMesh(gfx);
+    CreateTerrainMesh();
+
+    // Create vertex buffer
+    AddStaticBind(std::make_unique<VertexBuffer>(gfx, vertices));
+    // Create index buffer
+    AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, indices));
+
+    auto pvs = std::make_unique<VertexShader>(gfx, L"PhongVS.cso");
+    auto pvsbc = pvs->GetByteCode();
+    AddStaticBind(std::move(pvs));
+    AddStaticBind(std::make_unique<PixelShader>(gfx, L"PhongPS.cso"));
+
+    const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
+        {"Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"Normal",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
+    };
+    AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
+    AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+
+    struct PSMaterialConstant {
+        DirectX::XMFLOAT3 color;
+        float specularIntensity = 0.6f;
+        float specularPower = 30.0f;
+        float padding[3];
+    } pmc;
+    pmc.color = { 1.0f,1.0f,1.0f };
+    AddStaticBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+
+    AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 }
 
 void Terrain::LoadHeightmap(const std::string& heightmapFile) {
@@ -38,76 +68,94 @@ void Terrain::LoadHeightmap(const std::string& heightmapFile) {
     file.close();
 }
 
-void Terrain::CreateTerrainMesh(Graphics& gfx) {
+void Terrain::CreateTerrainMesh() {
+    vertices.clear();
+    indices.clear();
+    vertexIndexMap.clear();
+
     int rows = heightmap.size();
     int cols = heightmap[0].size();
 
-    // Generate vertices
+    cameraPos = cam.GetPos();
+
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            Vertex vertex;
-            vertex.pos = DirectX::XMFLOAT3(j * spacing, heightmap[i][j], i * spacing);
-            vertex.normal = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
-            vertices.push_back(vertex);
+            float x = j * spacing;
+            float z = i * spacing;
+
+            // 计算距离
+            float distance = sqrtf(powf(x - cameraPos.x, 2) + powf(z - cameraPos.z, 2));
+            if (distance <= MAX_LOAD_DIST) {
+                Vertex vertex;
+                vertex.pos = DirectX::XMFLOAT3(x, heightmap[i][j], z);
+                vertex.normal = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+                vertices.push_back(vertex);
+
+                vertexIndexMap[{i, j}] = vertices.size() - 1; // 存储顶点的索引
+            }
         }
     }
 
     // Generate indices
     for (int i = 0; i < rows - 1; ++i) {
         for (int j = 0; j < cols - 1; ++j) {
-            int topLeft = i * cols + j;
-            int topRight = i * cols + j + 1;
-            int bottomLeft = (i + 1) * cols + j;
-            int bottomRight = (i + 1) * cols + j + 1;
+            if (vertexIndexMap.count({ i, j }) && vertexIndexMap.count({ i + 1, j }) &&
+                vertexIndexMap.count({ i, j + 1 }) && vertexIndexMap.count({ i + 1, j + 1 })) {
+                int topLeft = vertexIndexMap[{i, j}];
+                int topRight = vertexIndexMap[{i, j + 1}];
+                int bottomLeft = vertexIndexMap[{i + 1, j}];
+                int bottomRight = vertexIndexMap[{i + 1, j + 1}];
 
-            // 顶点索引
-            indices.push_back(topLeft);
-            indices.push_back(bottomLeft);
-            indices.push_back(topRight);
+                // 顶点索引
+                indices.push_back(topLeft);
+                indices.push_back(bottomLeft);
+                indices.push_back(topRight);
 
-            indices.push_back(topRight);
-            indices.push_back(bottomLeft);
-            indices.push_back(bottomRight);
-            DirectX::XMVECTOR v0 = DirectX::XMLoadFloat3(&vertices[topLeft].pos);
-            DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vertices[bottomLeft].pos);
-            DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&vertices[topRight].pos); 
-            DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0), 
-                                                                   DirectX::XMVectorSubtract(v2, v0)));
+                indices.push_back(topRight);
+                indices.push_back(bottomLeft);
+                indices.push_back(bottomRight);
 
-            DirectX::XMFLOAT3 normalFloat3;
-            DirectX::XMStoreFloat3(&normalFloat3, normal);
+                DirectX::XMVECTOR v0 = DirectX::XMLoadFloat3(&vertices[topLeft].pos);
+                DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vertices[bottomLeft].pos);
+                DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&vertices[topRight].pos);
+                DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0),
+                    DirectX::XMVectorSubtract(v2, v0)));
 
-            vertices[topLeft].normal.x += normalFloat3.x;
-            vertices[topLeft].normal.y += normalFloat3.y;
-            vertices[topLeft].normal.z += normalFloat3.z;
+                DirectX::XMFLOAT3 normalFloat3;
+                DirectX::XMStoreFloat3(&normalFloat3, normal);
 
-            vertices[bottomLeft].normal.x += normalFloat3.x;
-            vertices[bottomLeft].normal.y += normalFloat3.y;
-            vertices[bottomLeft].normal.z += normalFloat3.z;
+                vertices[topLeft].normal.x += normalFloat3.x;
+                vertices[topLeft].normal.y += normalFloat3.y;
+                vertices[topLeft].normal.z += normalFloat3.z;
 
-            vertices[topRight].normal.x += normalFloat3.x;
-            vertices[topRight].normal.y += normalFloat3.y;
-            vertices[topRight].normal.z += normalFloat3.z;
+                vertices[bottomLeft].normal.x += normalFloat3.x;
+                vertices[bottomLeft].normal.y += normalFloat3.y;
+                vertices[bottomLeft].normal.z += normalFloat3.z;
 
-            v0 = DirectX::XMLoadFloat3(&vertices[topRight].pos);
-            v1 = DirectX::XMLoadFloat3(&vertices[bottomLeft].pos);
-            v2 = DirectX::XMLoadFloat3(&vertices[bottomRight].pos); 
-            normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0), 
-                                                 DirectX::XMVectorSubtract(v2, v0)));
+                vertices[topRight].normal.x += normalFloat3.x;
+                vertices[topRight].normal.y += normalFloat3.y;
+                vertices[topRight].normal.z += normalFloat3.z;
 
-            DirectX::XMStoreFloat3(&normalFloat3, normal);
+                v0 = DirectX::XMLoadFloat3(&vertices[topRight].pos);
+                v1 = DirectX::XMLoadFloat3(&vertices[bottomLeft].pos);
+                v2 = DirectX::XMLoadFloat3(&vertices[bottomRight].pos);
+                normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0),
+                    DirectX::XMVectorSubtract(v2, v0)));
 
-            vertices[topRight].normal.x += normalFloat3.x;
-            vertices[topRight].normal.y += normalFloat3.y;
-            vertices[topRight].normal.z += normalFloat3.z;
+                DirectX::XMStoreFloat3(&normalFloat3, normal);
 
-            vertices[bottomLeft].normal.x += normalFloat3.x;
-            vertices[bottomLeft].normal.y += normalFloat3.y;
-            vertices[bottomLeft].normal.z += normalFloat3.z;
+                vertices[topRight].normal.x += normalFloat3.x;
+                vertices[topRight].normal.y += normalFloat3.y;
+                vertices[topRight].normal.z += normalFloat3.z;
 
-            vertices[bottomRight].normal.x += normalFloat3.x;
-            vertices[bottomRight].normal.y += normalFloat3.y;
-            vertices[bottomRight].normal.z += normalFloat3.z;
+                vertices[bottomLeft].normal.x += normalFloat3.x;
+                vertices[bottomLeft].normal.y += normalFloat3.y;
+                vertices[bottomLeft].normal.z += normalFloat3.z;
+
+                vertices[bottomRight].normal.x += normalFloat3.x;
+                vertices[bottomRight].normal.y += normalFloat3.y;
+                vertices[bottomRight].normal.z += normalFloat3.z;
+            }
         }
     }
     for (auto& vertex : vertices) {
@@ -115,36 +163,6 @@ void Terrain::CreateTerrainMesh(Graphics& gfx) {
         normal = DirectX::XMVector3Normalize(normal);
         DirectX::XMStoreFloat3(&vertex.normal, normal);
     }
-
-    // Create vertex buffer
-    AddStaticBind(std::make_unique<VertexBuffer>(gfx, vertices));
-
-    // Create index buffer
-    AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, indices));
-
-    auto pvs = std::make_unique<VertexShader>(gfx, L"PhongVS.cso");
-    auto pvsbc = pvs->GetByteCode();
-    AddStaticBind(std::move(pvs));
-    AddStaticBind(std::make_unique<PixelShader>(gfx, L"PhongPS.cso"));
-
-    const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
-        {"Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-        {"Normal",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
-    };
-    AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
-    AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-
-    struct PSMaterialConstant {
-        DirectX::XMFLOAT3 color;
-        float specularIntensity = 0.6f;
-        float specularPower = 30.0f;
-        float padding[3];
-    } pmc;
-    pmc.color = { 1.0f,1.0f,1.0f };
-    AddStaticBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
-
-
-    AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 }
 
 DirectX::XMMATRIX Terrain::GetTransformXM() const noexcept {
@@ -152,4 +170,7 @@ DirectX::XMMATRIX Terrain::GetTransformXM() const noexcept {
 }
 
 void Terrain::Update(float dt) noexcept {
+    if (cam.GetPos().x != cameraPos.x || cam.GetPos().y != cameraPos.y || cam.GetPos().z != cameraPos.z) {
+        CreateTerrainMesh();
+    }
 }

@@ -7,6 +7,7 @@ public:
 	void SpawnControlWindow() noexcept;
 	void Reset() noexcept;
 	DirectX::XMMATRIX GetProjectionMatrix(float aspectRatio) const noexcept;
+	DirectX::XMFLOAT3 GetPos() const noexcept;
 private:
 	float x = 0.0f;
 	float y = 0.0f;

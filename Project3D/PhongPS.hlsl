@@ -28,14 +28,14 @@ cbuffer ObjectCBuf : register(b1)
     float specularPower;
 };
 
-float3 ComputeLight(float3 lightDir, float att, float3 n, Light light)
+float3 ComputeLight(float3 lightDir, float att, float3 n, Light light, float3 worldPos)
 {
     // 漫反射
     float3 diffuse = light.diffuseColor * light.diffuseIntensity * att * max(0.0f, dot(lightDir, n));
     
     // 高光反射
     float3 reflectDir = reflect(-lightDir, n);
-    float3 viewDir = normalize(-lightDir); // 假设视线方向和光源方向相同
+    float3 viewDir = normalize(-worldPos);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0f), specularPower);
     float3 specular = specularIntensity * spec * light.diffuseColor * att;
     
@@ -57,12 +57,12 @@ float4 main(float3 worldPos : Position, float3 n : Normal) : SV_Target
             float distToL = length(vToL);
             lightDir = vToL / distToL;
             float att = 1.0f / (lights[i].attConst + lights[i].attLin * distToL + lights[i].attQuad * (distToL * distToL));
-            finalColor += ComputeLight(lightDir, att, n, lights[i]);
+            finalColor += ComputeLight(lightDir, att, n, lights[i], worldPos);
         }
         else if (lights[i].lightType == 1) // 定向光
         {
             lightDir = normalize(lights[i].lightPos);
-            finalColor += ComputeLight(lightDir, 1.0f, n, lights[i]);
+            finalColor += ComputeLight(lightDir, 1.0f, n, lights[i], worldPos);
         }
     }
     
