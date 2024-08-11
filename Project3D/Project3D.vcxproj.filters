@@ -117,9 +117,6 @@
     <ClCompile Include="Melon.cpp">
       <Filter>源文件\Drawable</Filter>
     </ClCompile>
-    <ClCompile Include="Pyramid.cpp">
-      <Filter>源文件\Drawable</Filter>
-    </ClCompile>
     <ClCompile Include="Surface.cpp">
       <Filter>源文件\Drawable</Filter>
     </ClCompile>
@@ -128,12 +125,6 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>源文件\Bindable</Filter>
-    </ClCompile>
-    <ClCompile Include="SkinnedBox.cpp">
-      <Filter>源文件\Drawable</Filter>
-    </ClCompile>
-    <ClCompile Include="Sheet.cpp">
-      <Filter>源文件\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="ImguiManager.cpp">
       <Filter>源文件</Filter>
@@ -165,9 +156,6 @@
     <ClCompile Include="Light.cpp">
       <Filter>源文件\GraphicsBase</Filter>
     </ClCompile>
-    <ClCompile Include="SolidSphere.cpp">
-      <Filter>源文件\Drawable</Filter>
-    </ClCompile>
     <ClCompile Include="SimObjectBase.cpp">
       <Filter>源文件\SimObject</Filter>
     </ClCompile>
@@ -190,6 +178,9 @@
       <Filter>源文件\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="AssModel.cpp">
+      <Filter>源文件\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="SolidSphere.cpp">
       <Filter>源文件\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
@@ -260,9 +251,6 @@
     <ClInclude Include="Melon.h">
       <Filter>头文件\Drawable</Filter>
     </ClInclude>
-    <ClInclude Include="Pyramid.h">
-      <Filter>头文件\Drawable</Filter>
-    </ClInclude>
     <ClInclude Include="Surface.h">
       <Filter>头文件\Drawable</Filter>
     </ClInclude>
@@ -271,9 +259,6 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>头文件\Bindable</Filter>
-    </ClInclude>
-    <ClInclude Include="SkinnedBox.h">
-      <Filter>头文件\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="IndexedTriangleList.h">
       <Filter>头文件\Geometry</Filter>
@@ -289,9 +274,6 @@
     </ClInclude>
     <ClInclude Include="Sphere.h">
       <Filter>头文件\Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Sheet.h">
-      <Filter>头文件\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="ImguiManager.h">
       <Filter>头文件</Filter>
@@ -319,9 +301,6 @@
     </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
       <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="SolidSphere.h">
-      <Filter>头文件\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>头文件\GraphicsBase</Filter>
@@ -353,6 +332,9 @@
     <ClInclude Include="Terrain.h">
       <Filter>头文件\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="SolidSphere.h">
+      <Filter>头文件\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -366,23 +348,8 @@
     <Image Include="images\cube.png">
       <Filter>Images</Filter>
     </Image>
-    <Image Include="Images\map1.png">
-      <Filter>Images</Filter>
-    </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ColorIndexVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorIndexPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorBlendVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorBlendPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="TextureVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
@@ -395,12 +362,6 @@
     <FxCompile Include="PhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="SolidVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="SolidPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="BlendedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
@@ -411,6 +372,12 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="TexturedPhongVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

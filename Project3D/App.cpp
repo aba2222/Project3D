@@ -10,48 +10,10 @@ App::App()
 	: wnd(800, 600, "3D Box"),
 	  light(wnd.Gfx(), 1),
 	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt", cam){
-	class Factory {
-	public:
-		Factory(Graphics& gfx): gfx(gfx) {}
-		std::unique_ptr<Drawable> operator()() {
-			const DirectX::XMFLOAT3 mat = { cdist(rng),cdist(rng),cdist(rng) };
-			switch (typedist(rng)) {
-			case 0:
-				return std::make_unique<Pyramid>(gfx, rng, adist, ddist, odist, rdist, tdist);
-			case 1:
-				return std::make_unique<Box>(gfx, rng, adist, ddist, odist, rdist, bdist, mat);
-			case 2:
-				return std::make_unique<SkinnedBox>(gfx, rng, adist, ddist, odist, rdist);
-			case 3:
-				return std::make_unique<Melon>(gfx, rng, adist, ddist, odist, rdist, longdist, latdist);
-			case 4:
-				return std::make_unique<Sheet>(gfx, rng, adist, ddist, odist, rdist);
-			default:
-				assert(false && "你这有问题啊");
-				return {};
-			}
-		}
-
-	private:
-		Graphics& gfx;
-		std::mt19937 rng{std::random_device{}()};
-		std::uniform_real_distribution<float> adist{ 0.0f, PI * 2.0f };
-		std::uniform_real_distribution<float> ddist{ 0.0f, PI * 0.5f };
-		std::uniform_real_distribution<float> odist{ 0.0f, PI * 0.08f };
-		std::uniform_real_distribution<float> rdist{ 6.0f, 20.0f };
-		std::uniform_real_distribution<float> bdist{ 0.4f, 3.0f };
-		std::uniform_int_distribution<int> latdist{ 5, 20 };
-		std::uniform_int_distribution<int> longdist{ 10, 40 };
-		std::uniform_real_distribution<float> cdist{ 0.0f,1.0f };
-		std::uniform_int_distribution<int> typedist{ 0, 2 };
-		std::uniform_int_distribution<int> tdist{ 3, 30 };
-	};
-
 	#ifdef FSP_COUNT
 	fsp = 0;
 	#endif // FSP_COUNT;
 
-	Factory f(wnd.Gfx());
 	drawables.reserve(nDrawbles);
 	//std::generate_n(std::back_inserter(drawables), nDrawbles, f);
 	testObj = std::make_unique<SimObjectBase>(wnd.Gfx(), wnd.kbd, "test", 122.6, 78000);
@@ -86,7 +48,6 @@ void App::DoFrame() {
 
 	testObj->Update();
 	terr.Update(dt);
-	terr.Draw(wnd.Gfx());
 	for (auto& d : drawables) {
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
 		d->Draw(wnd.Gfx());
