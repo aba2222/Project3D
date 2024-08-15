@@ -15,6 +15,8 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 	void SetTitle(const std::string& title);
+	UINT GetWidth() const noexcept;
+	UINT GetHeight() const noexcept;
 	static std::optional<int> ProcessMessages();
 	Graphics& Gfx();
 	Keyboard kbd;
@@ -30,17 +32,17 @@ private:
 		~WindowClass();
 		WindowClass(const WindowClass&) = delete;
 		WindowClass& operator=(const WindowClass&) = delete;
-		static constexpr const char* wndClassName = "First Direct3D Window";
+		static constexpr const char* wndClassName = "Direct3D Window";
 		static WindowClass wndClass;
 		HINSTANCE hInst;
 	};
 
 	static LRESULT CALLBACK HandleMsgSteup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept; 
 
-	int width;
-	int height;
+	UINT width;
+	UINT height;
 	HWND hWnd;
 	std::unique_ptr<Graphics> pGfx;
 };

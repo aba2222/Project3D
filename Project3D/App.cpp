@@ -18,8 +18,6 @@ App::App()
 	//std::generate_n(std::back_inserter(drawables), nDrawbles, f);
 	testObj = std::make_unique<SimObjectBase>(wnd.Gfx(), wnd.kbd, "test", 122.6, 78000);
 	drawables.push_back(testObj->GetModel());
-
-	wnd.Gfx().SetProjection(cam.GetProjectionMatrix(4.0f / 3.0f));
 }
 
 int App::Go() {
@@ -37,13 +35,13 @@ void App::DoFrame() {
 	oss << "Time is:" << t << 's';
 	wnd.SetTitle(oss.str());*/
 	auto dt = timer.Mark() * speed_factor;
-
 	if (wnd.kbd.ReadChar() == 'g') {
 		wnd.Gfx().ImguiSwitch();
 	}
 
 	wnd.Gfx().BeginFrame(0.275f, 0.510f, 0.706f);
 	wnd.Gfx().SetCamera(cam.GetMatrix());
+	wnd.Gfx().SetProjection(cam.GetProjectionMatrix((float)wnd.GetWidth() / (float)wnd.GetHeight()));
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
 
 	testObj->Update();

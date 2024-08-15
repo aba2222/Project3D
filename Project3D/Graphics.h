@@ -36,8 +36,11 @@ public:
 	DirectX::XMMATRIX GetCamera() const noexcept;
 	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 	void SetCamera(DirectX::XMMATRIX cam) noexcept;
+	void Resize(UINT newWidth, UINT newHeight);
+	void CreateTargetAndDepth(UINT width, UINT height);
 
 private:
+	HWND hWnd;
 	bool imguiStatus = 1;
 	DirectX::XMMATRIX projection;
 	DirectX::XMMATRIX camera;
@@ -48,5 +51,6 @@ private:
 	ComPtr<ID3D11RenderTargetView> pTarget = nullptr;
 	ComPtr<ID3D11DepthStencilView> pDSV;
 	D3D_FEATURE_LEVEL featureLevel;
+	D3D11_VIEWPORT vp;
 };
 

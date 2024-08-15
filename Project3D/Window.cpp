@@ -44,11 +44,11 @@ Window::Window(int width, int height, const char* name)
 	if (AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, 0) == 0) { //把宽度改为整个窗口的，原来是空白区域的
 		throw ExceptionHandle(__LINE__, __FILE__);
 	}
-	hWnd = CreateWindow(WindowClass::GetName(), name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+	hWnd = CreateWindow(WindowClass::GetName(), name, WS_SIZEBOX | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr,
 		WindowClass::GetInstance(), this);
 
-	if (hWnd == nullptr) { //把宽度改为整个窗口的，原来是空白区域的
+	if (hWnd == nullptr) {
 		throw ExceptionHandle(__LINE__, __FILE__);
 	}
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
@@ -68,6 +68,9 @@ void Window::SetTitle(const std::string& title) {
 		throw ExceptionHandle(__LINE__, __FILE__);
 	}
 }
+
+UINT Window::GetWidth() const noexcept { return width; }
+UINT Window::GetHeight() const noexcept { return height; }
 
 std::optional<int> Window::ProcessMessages() {
 	MSG msg;
@@ -91,7 +94,7 @@ LRESULT CALLBACK Window::HandleMsgSteup(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 	if (msg == WM_CREATE) {
 		const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
 		Window* const pWnd = static_cast<Window*>(pCreate->lpCreateParams);
-		//TODO why?
+		//TODO
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::HandleMsgThunk));
 		return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
@@ -194,6 +197,17 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		const POINTS pt MAKEPOINTS(lParam);
 		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		mouse.OnWheelDeltaCarry(pt.x, pt.y, delta);
+		break;
+	}
+	case WM_SIZE: {
+		width = LOWORD(lParam);
+		height = HIWORD(lParam);
+
+		if (width == 0 || height == 0) { break; }
+
+		if(pGfx != nullptr)
+		pGfx->Resize(width, height);
+		break;
 	}
 	}
 
