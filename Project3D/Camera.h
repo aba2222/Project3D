@@ -1,18 +1,13 @@
 #pragma once
 #include "Graphics.h"
+#include "Updatable.h"
 
-class Camera {
+class Camera : public Updatable {
 public:
+	Camera();
 	DirectX::XMMATRIX GetMatrix() const noexcept;
 	void SpawnControlWindow() noexcept;
+	void Update(float dt) noexcept;
 	void Reset() noexcept;
 	DirectX::XMMATRIX GetProjectionMatrix(float aspectRatio) const noexcept;
-	DirectX::XMFLOAT3 GetPos() const noexcept;
-private:
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = -30.0f;
-	float pitch = 0.0f;
-	float yaw = 0.0f;
-	float roll = 0.0f;
 };

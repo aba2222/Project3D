@@ -1,10 +1,12 @@
 #include "Terrain.h"
 #define SwapByte(x) (x << 8) | ((x >> 8) & 0xFF)
 
+std::unique_ptr<Camera> TerrainChunk::cam = nullptr;
+
 Terrain::Terrain(Graphics& gfx, const std::string& heightmapFile, Camera& cam) 
     : cam(cam),
       gfx(gfx) {
-    LoadHeightmap(heightmapFile);
+    //LoadHeightmap(heightmapFile);
 }
 
 void Terrain::LoadHeightmap(const std::string& heightmapFile) {
@@ -20,7 +22,7 @@ void Terrain::LoadHeightmap(const std::string& heightmapFile) {
     else if (fileSize == 3601 * 3601 * sizeof(int16_t)) { dimension = 3601; }
     else { throw ExceptionHandle(__LINE__, __FILE__); }
 
-    heightmap.resize(dimension, std::vector<float>(dimension));
+    //heightmap.resize(dimension, std::vector<float>(dimension));
 
     for (int i = 0; i < dimension; ++i) {
         for (int j = 0; j < dimension; ++j) {
@@ -33,13 +35,13 @@ void Terrain::LoadHeightmap(const std::string& heightmapFile) {
             if (height == -32768) {
                 height = 0; // Handle voids in SRTM data
             }
-            heightmap[i][j] = static_cast<float>(height);
+            //heightmap[i][j] = static_cast<float>(height);
         }
     }
     file.close();
 }
 
-void Terrain::TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& heightmap, int chunkSize, float spacing) {
+void TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& heightmap, int chunkSize, float spacing) {
     int vertexCount = (chunkSize + 1) * (chunkSize + 1);
     for (int i = 0; i <= chunkSize; ++i) {
         for (int j = 0; j <= chunkSize; ++j) {
@@ -111,21 +113,21 @@ void Terrain::TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& he
     }
 
     // Create vertex buffer
-    AddStaticBind(std::make_unique<VertexBuffer>(gfx, vertices));
+    AddBind(std::make_unique<VertexBuffer>(gfx, vertices));
     // Create index buffer
-    AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, indices));
+    AddIndexBuffer(std::make_unique<IndexBuffer>(gfx, indices));
 
     auto pvs = std::make_unique<VertexShader>(gfx, L"PhongVS.cso");
     auto pvsbc = pvs->GetByteCode();
-    AddStaticBind(std::move(pvs));
-    AddStaticBind(std::make_unique<PixelShader>(gfx, L"PhongPS.cso"));
+    AddBind(std::move(pvs));
+    AddBind(std::make_unique<PixelShader>(gfx, L"PhongPS.cso"));
 
     const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
         {"Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
         {"Normal",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
     };
-    AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
-    AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+    AddBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
+    AddBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
     struct PSMaterialConstant {
         DirectX::XMFLOAT3 color;
@@ -134,50 +136,44 @@ void Terrain::TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& he
         float padding[3];
     } pmc;
     pmc.color = { 1.0f,1.0f,1.0f };
-    AddStaticBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+    AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
 
     AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 }
 
-Terrain::TerrainChunk::TerrainChunk(Graphics& gfx, const std::string& heightmapFile) 
+TerrainChunk::TerrainChunk(Graphics& gfx, const std::string& heightmapFile, std::unique_ptr<Camera> cam)
     : gfx(gfx) {
+    if (!cam) {
+        cam = std::move(cam);
+    }
 }
 
-DirectX::XMMATRIX Terrain::TerrainChunk::GetTransformXM() const noexcept {
+DirectX::XMMATRIX TerrainChunk::GetTransformXM() const noexcept {
     return DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
 
-void Terrain::Update(float dt) noexcept {
-    DirectX::XMVECTOR camPosVec = DirectX::XMVectorSet(cam.GetPos().x, cam.GetPos().y, cam.GetPos().z, 0.0f);
-    DirectX::XMVECTOR oldCamPosVec = DirectX::XMVectorSet(cameraPos.x, cameraPos.y, cameraPos.z, 0.0f);
-    DirectX::XMVECTOR delta = DirectX::XMVectorSubtract(camPosVec, oldCamPosVec);
-    float distanceSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(delta));
+void TerrainChunk::Update(float dt) noexcept {
+    // 获取相对于 Cam 的平移矩阵
+    std::unique_ptr<EarthPos> nowPos = cam->GetEarthPos();
+    localPos = nowPos->ToLocal((GetEarthPos()));
+    if (localPos.x > MAX_LOAD_DIST || localPos.y > MAX_LOAD_DIST || localPos.z > MAX_LOAD_DIST) {;
+        delete this;
+    }
+    Draw(gfx);
+}
 
-    if (distanceSq > REBUILD_THRESHOLD * REBUILD_THRESHOLD) {
-        cameraPos = cam.GetPos();
-        DirectX::XMFLOAT3 newChunkPos = { cameraPos.x - ((int)cameraPos.x % CHUNK_SIZE), 0.0f, cameraPos.z - ((int)cameraPos.z % CHUNK_SIZE) };
-        bool haveChunk = 0;
-        for (auto& a : activeChunks) {
-            if (a->chunkPos.x == newChunkPos.x && a->chunkPos.z == newChunkPos.z){
-                haveChunk = 1;
-            }
-            a->Draw(gfx);
-        }
-        if (haveChunk == 1) return;
-        auto newChunk = std::make_unique<TerrainChunk>(gfx, "Scenery\\N29E121.hgt");
-        newChunk->chunkPos = newChunkPos;
-        newChunk->CreateMesh(heightmap, CHUNK_SIZE, spacing);
-        activeChunks.insert(activeChunks.begin(), std::move(newChunk));
-        return;
-    }
+void Terrain::Update(float dt) noexcept {
+    /*std::unique_ptr<EarthPos> nowPos = cam.GetEarthPos();
+    bool haveChunk = 0;
     for (auto a = activeChunks.begin(); a != activeChunks.end(); a++) {
-        DirectX::XMVECTOR chunkPosVec = DirectX::XMVectorSet((*a)->chunkPos.x, (*a)->chunkPos.y, (*a)->chunkPos.z, 0.0f);
-        DirectX::XMVECTOR delta = DirectX::XMVectorSubtract(chunkPosVec, camPosVec);
-        float distanceSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(delta));
-        if (distanceSq > MAX_LOAD_DIST * MAX_LOAD_DIST) {
-            a = activeChunks.erase(a);
-            continue;
+        if ((*a)->GetEarthPos()->longitude == newChunkPos.x && (*a)->GetEarthPos()->latitude == newChunkPos.z) {
+            haveChunk = 1;
         }
-        (*a)->Draw(gfx);
     }
+    if (haveChunk == 1) return;
+    auto newChunk = std::make_unique<TerrainChunk>(gfx, "Scenery\\N29E121.hgt", std::make_unique<Camera>(cam));
+    newChunk->chunkPos = newChunkPos;
+    newChunk->CreateMesh(heightmap, CHUNK_SIZE, spacing);
+    activeChunks.insert(activeChunks.begin(), std::move(newChunk));
+    return;*/
 }

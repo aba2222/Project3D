@@ -3,12 +3,12 @@
 #include "SolidSphere.h"
 #include "ConstantBuffer.h"
 
-class Light {
+class Light : public Updatable {
 public:
 	Light(Graphics& gfx, int type, float radius = 0.5f);
 	void SpawnControlWindow() noexcept;
 	void Reset() noexcept;
-	void Draw(Graphics& gfx) const;
+	void Update(float dt) noexcept;
 	void Bind(Graphics& gfx, DirectX::FXMMATRIX view) const noexcept;
 private:
 	struct PointLightCBuf {
@@ -32,4 +32,5 @@ private:
 	//PointLightCBuf lData;
 	mutable SolidSphere mesh;
 	mutable PixelConstantBuffer<PointLightCBuf> cbuf;
+	Graphics& gfx;
 };

@@ -12,6 +12,7 @@
 #include "Math3D.h"
 #include "SimObjectBase.h"
 #include "Terrain.h"
+#include "Updatable.h"
 //#define FSP_COUNT
 
 class App {
@@ -28,7 +29,7 @@ private:
 	ProTimer timer;
 	Camera cam;
 	Light light;
-	std::vector<std::unique_ptr<class Drawable>> drawables;
+	std::vector<std::unique_ptr<Updatable>> updatables;
 	static constexpr size_t nDrawbles = 180;
 	Terrain terr;
 	#ifdef FSP_COUNT

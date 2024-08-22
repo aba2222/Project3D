@@ -4,7 +4,8 @@
 Light::Light(Graphics& gfx, int type, float radius)
 	: mesh(gfx, radius),
 	  cbuf(gfx),
-      lightType(type) {
+      lightType(type),
+	  gfx(gfx) {
 	Reset();
 }
 
@@ -50,7 +51,7 @@ void Light::Reset() noexcept {
 	});
 }
 
-void Light::Draw(Graphics& gfx) const {
+void Light::Update(float dt) noexcept {
 	if (lightType == 0) {
 		//mesh.SetPos(lData.pos);
 		mesh.Draw(gfx);

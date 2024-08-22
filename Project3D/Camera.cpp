@@ -1,19 +1,23 @@
 #include "Camera.h"
 
+Camera::Camera() {
+	pos = std::make_unique<EarthPos>(DSMTD(121.0f, 27.0f, 51.0f), DSMTD(29.0f, 49.0f, 30.0f), 100.0f, 0.0f, 0.0f, 0.0f);
+}
+
 DirectX::XMMATRIX Camera::GetMatrix() const noexcept {
 	// 定义相机位置向量
-	const auto pos = DirectX::XMVectorSet(x, y, z, 1.0f);
+	const auto pos_t = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// 计算相机目标位置
 	const auto forward = DirectX::XMVector3Transform(
 		DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
-		DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll)
+		DirectX::XMMatrixRotationRollPitchYaw(pos->pitch, pos->yaw, pos->roll)
 	);
-	const auto target = DirectX::XMVectorAdd(pos, forward);
+	const auto target = DirectX::XMVectorAdd(pos_t, forward);
 
 	// 返回视图矩阵，结合相机位置和旋转
 	return DirectX::XMMatrixLookAtLH(
-		pos,
+		pos_t,
 		target,
 		DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
 	);
@@ -29,20 +33,20 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix(float aspectRatio) const noexcept 
 	DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f);
 }
 
-DirectX::XMFLOAT3 Camera::GetPos() const noexcept {
+/*DirectX::XMFLOAT3 Camera::GetPos() const noexcept {
 	return DirectX::XMFLOAT3(x, y, z);
-}
+}*/
 
 void Camera::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Camera")) {
 		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &x, -100, 100);
-		ImGui::SliderFloat("Y", &y, -100, 100);
-		ImGui::SliderFloat("Z", &z, -100, 100);
+		ImGui::SliderFloat("lat", &pos->latitude, 28.51f, 30.33f);
+		ImGui::SliderFloat("lon", &pos->longitude, 120.55f, 120.16f);
+		ImGui::SliderFloat("alt", &pos->altitude, 0, 1000);
 		ImGui::Text("Orientation");
-		ImGui::SliderAngle("Roll", &roll, -180.0f, 180.0f);
-		ImGui::SliderAngle("Pitch", &pitch, -180.0f, 180.0f);
-		ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
+		ImGui::SliderAngle("Roll", &pos->roll, -180.0f, 180.0f);
+		ImGui::SliderAngle("Pitch", &pos->pitch, -180.0f, 180.0f);
+		ImGui::SliderAngle("Yaw", &pos->yaw, -180.0f, 180.0f);
 		if (ImGui::Button("Reset")) {
 			Reset();
 		}
@@ -50,11 +54,14 @@ void Camera::SpawnControlWindow() noexcept {
 	ImGui::End();
 }
 
+void Camera::Update(float dt) noexcept {
+}
+
 void Camera::Reset() noexcept {
-	x = 0.0f;
-	y = 0.0f;
-	z = -30.0f;
-	pitch = 0.0f;
-	yaw = 0.0f;
-	roll = 0.0f;
+	pos->latitude = DSMTD(29.0f, 49.0f, 30.0f);
+	pos->longitude = DSMTD(121.0f, 27.0f, 51.0f);
+	pos->altitude = 100.0f;
+	pos->pitch = 0.0f;
+	pos->yaw = 0.0f;
+	pos->roll = 0.0f;
 }

@@ -4,8 +4,8 @@
 #include "Sphere.h"
 
 
-SolidSphere::SolidSphere(Graphics& gfx, float radius)
-{
+SolidSphere::SolidSphere(Graphics& gfx, float radius) 
+	: gfx(gfx) {
 	namespace dx = DirectX;
 
 	if (!IsStaticInitialized())	{
@@ -43,7 +43,9 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 	AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 }
 
-void SolidSphere::Update(float dt) noexcept {}
+void SolidSphere::Update(float dt) noexcept {
+	Draw(gfx);
+}
 
 void SolidSphere::SetPos(DirectX::XMFLOAT3 pos) noexcept {
 	this->pos = pos;

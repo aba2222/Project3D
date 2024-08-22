@@ -8,9 +8,11 @@
 #include "ConstantBuffer.h"
 #include "Topology.h"
 #include "Cube.h"
+#include "EarthPos.h"
+#include "Updatable.h"
 #include <DirectXMath.h>
 
-class Drawable {
+class Drawable : public Updatable {
 	template<class T>
 	friend class DrawableBase;
 public:
@@ -24,7 +26,6 @@ public:
 protected:
 	void AddBind(std::unique_ptr<Bindable> bind);
 	void AddIndexBuffer(std::unique_ptr<IndexBuffer> indexBuffer) noexcept;
-
 private:
 	virtual const std::vector<std::unique_ptr<Bindable>>& GetStaticBinds() const noexcept = 0;
 	const IndexBuffer* pIndexBuffer = nullptr;

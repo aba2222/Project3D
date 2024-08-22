@@ -6,7 +6,9 @@ SimObjectBase::SimObjectBase(Graphics& gfx, Keyboard& keyBoard, std::string name
 	: name(name),
 	 forces(S, m),
 	 id(0),
-     kbd(keyBoard) {
+     kbd(keyBoard),
+	 gfx(gfx) {
+	pos = std::make_unique<EarthPos>(DSMTD(121.0f, 27.0f, 51.0f), DSMTD(29.0f, 49.0f, 30.0f), 90.0f, 0.0f, 0.0f, 0.0f);
 	model = std::make_unique<AssModel>(gfx, "Models\\320.obj", DirectX::XMFLOAT3{ 1,1,1 },1.0f);
 	std::vector<EngineControl::Engine> engVec;
 	engVec.push_back({ 564,2,120000 ,0 });
@@ -17,7 +19,7 @@ SimObjectBase::SimObjectBase(Graphics& gfx, Keyboard& keyBoard, std::string name
 
 SimObjectBase::~SimObjectBase() {}
 
-void SimObjectBase::Update() {
+void SimObjectBase::Update(float dt) noexcept {
 	if (controls[1] != nullptr) {
 		if (kbd.KeyIsPressed(VK_F3)) { controls[1]->IncStatus(+1); }
 		else if (kbd.KeyIsPressed(VK_F2)) { controls[1]->IncStatus(-1); }
@@ -27,6 +29,7 @@ void SimObjectBase::Update() {
 		controls[i]->Update();
 	}
 	forces.Update();
+	model->Draw(gfx);
 }
 
 void SimObjectBase::SpawnControlWindow() {

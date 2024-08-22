@@ -13,11 +13,7 @@ App::App()
 	#ifdef FSP_COUNT
 	fsp = 0;
 	#endif // FSP_COUNT;
-
-	drawables.reserve(nDrawbles);
-	//std::generate_n(std::back_inserter(drawables), nDrawbles, f);
 	testObj = std::make_unique<SimObjectBase>(wnd.Gfx(), wnd.kbd, "test", 122.6, 78000);
-	drawables.push_back(testObj->GetModel());
 }
 
 int App::Go() {
@@ -43,14 +39,12 @@ void App::DoFrame() {
 	wnd.Gfx().SetCamera(cam.GetMatrix());
 	wnd.Gfx().SetProjection(cam.GetProjectionMatrix((float)wnd.GetWidth() / (float)wnd.GetHeight()));
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
+	light.Update(0.0f);
+	testObj->Update(0.0f);
 
-	testObj->Update();
-	terr.Update(dt);
-	for (auto& d : drawables) {
+	for (auto& d : updatables) {
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
-		d->Draw(wnd.Gfx());
 	}
-	light.Draw(wnd.Gfx());
 
 	if (wnd.Gfx().ImguiStatus()) {
 		if (ImGui::Begin("Sim speed")) {

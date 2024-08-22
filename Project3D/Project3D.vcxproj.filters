@@ -335,6 +335,12 @@
     <ClInclude Include="SolidSphere.h">
       <Filter>头文件\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="EarthPos.h">
+      <Filter>头文件\SimObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Updatable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

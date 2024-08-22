@@ -14,16 +14,12 @@
 #define REBUILD_THRESHOLD 30
 #define CHUNK_SIZE 30
 
-class Terrain {
+class TerrainChunk : public DrawableBase<TerrainChunk> {
 public:
-	Terrain(Graphics& gfx, const std::string& heightmapFile, Camera& cam);
-	void LoadHeightmap(const std::string& heightmapFile);
+	TerrainChunk(Graphics& gfx, const std::string& heightmapFile, std::unique_ptr<Camera> cam);
+	DirectX::XMMATRIX GetTransformXM() const noexcept;
 	void Update(float dt) noexcept;
-
-	struct Vertex {
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT3 normal;
-	};
+	void CreateMesh(const std::vector<std::vector<float>>& heightmap, int chunkSize, float spacing);
 
 	struct pair_hash {
 		template <class T1, class T2>
@@ -31,29 +27,33 @@ public:
 			return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
 		}
 	};
-	class TerrainChunk : public DrawableBase<TerrainChunk> {
-		friend class Terrain;
-	public:
-		TerrainChunk(Graphics& gfx, const std::string& heightmapFile);
-		DirectX::XMMATRIX GetTransformXM() const noexcept;
-		void Update(float dt) noexcept {};
-		void CreateMesh(const std::vector<std::vector<float>>& heightmap, int chunkSize, float spacing);
 
-	protected:
-		Graphics& gfx;
-		std::unordered_map<std::pair<int, int>, int, pair_hash> vertexIndexMap;
-		std::vector<Vertex> vertices;
-		std::vector<unsigned short> indices;
-		DirectX::XMFLOAT3 chunkPos;
+protected:
+	static std::unique_ptr<Camera> cam;
+	struct Vertex {
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT3 normal;
 	};
-
-private:
-	std::vector<std::vector<float>> heightmap;
+	DirectX::XMFLOAT3 localPos;
+	Graphics& gfx;
+	std::unordered_map<std::pair<int, int>, int, pair_hash> vertexIndexMap;
 	std::vector<Vertex> vertices;
 	std::vector<unsigned short> indices;
-	float spacing = 30.0f;
-	Camera& cam;
-	Graphics& gfx;
-	DirectX::XMFLOAT3 cameraPos;
-	std::list<std::unique_ptr<TerrainChunk>> activeChunks;
 };
+
+class Terrain {
+friend class TerrainChunk;
+public:
+	Terrain(Graphics& gfx, const std::string& heightmapFile, Camera& cam);
+	void LoadHeightmap(const std::string& heightmapFile);
+	void Update(float dt) noexcept;
+
+private:
+	float spacing = 30.0f;
+	Graphics& gfx;
+	Camera& cam;
+	float lastCamLat;
+	float lastCamLon;
+	float lastCamAtt;
+	std::list<std::unique_ptr<TerrainChunk>> activeChunks;
+};	
