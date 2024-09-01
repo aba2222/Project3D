@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera() {
-	pos = std::make_unique<EarthPos>(DSMTD(121.0f, 27.0f, 51.0f), DSMTD(29.0f, 49.0f, 30.0f), 100.0f, 0.0f, 0.0f, 0.0f);
+	pos = std::make_unique<EarthPos>(DSMTD(121.0f, 27.8f, 0.0f), DSMTD(29.0f, 49.6f, 00.0f), 100.0f, 0.0f, 0.0f, 0.0f);
 }
 
 DirectX::XMMATRIX Camera::GetMatrix() const noexcept {
@@ -40,8 +40,8 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix(float aspectRatio) const noexcept 
 void Camera::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Camera")) {
 		ImGui::Text("Position");
-		ImGui::SliderFloat("lat", &(pos->latitude), 29.00f, 29.95f);
-		ImGui::SliderFloat("lon", &(pos->longitude), 121.00f, 121.95f);
+		ImGui::SliderFloat("lat", &(pos->latitude), 29.80f, 29.95f);
+		ImGui::SliderFloat("lon", &(pos->longitude), 121.40f, 121.55f);
 		ImGui::SliderFloat("alt", &(pos->altitude), 0, 1000);
 		ImGui::Text("Orientation");
 		ImGui::SliderAngle("Roll", &(pos->roll), -180.0f, 180.0f);
@@ -58,8 +58,8 @@ void Camera::Update(float dt) noexcept {
 }
 
 void Camera::Reset() noexcept {
-	pos->latitude = DSMTD(29.0f, 49.0f, 30.0f);
-	pos->longitude = DSMTD(121.0f, 27.0f, 51.0f);
+	pos->latitude = DSMTD(121.0f, 27.8f, 0.0f);
+	pos->longitude = DSMTD(29.0f, 49.6f, 00.0f);
 	pos->altitude = 100.0f;
 	pos->pitch = 0.0f;
 	pos->yaw = 0.0f;

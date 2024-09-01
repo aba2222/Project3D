@@ -12,9 +12,9 @@
 #include "DrawableBase.h"
 #include "Camera.h"
 #define MAX_LOAD_DIST 3000
-#define MAX_LOAD_DIST_LON 0.00027777777f
+#define MAX_LOAD_DIST_LON 0.0269f
 #define REBUILD_THRESHOLD 30
-#define CHUNK_SIZE 30
+#define CHUNK_SIZE 100
 
 class TerrainChunk : public DrawableBase<TerrainChunk> {
 public:

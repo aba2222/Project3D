@@ -31,13 +31,16 @@ cbuffer ObjectCBuf : register(b1)
 float3 ComputeLight(float3 lightDir, float att, float3 n, Light light, float3 worldPos)
 {
     // 漫反射
-    float3 diffuse = light.diffuseColor * light.diffuseIntensity * att * max(0.0f, dot(lightDir, n));
+    float3 diffuse = light.diffuseColor * light.diffuseIntensity * att * saturate(dot(lightDir, n));
     
     // 高光反射
     float3 reflectDir = reflect(-lightDir, n);
     float3 viewDir = normalize(-worldPos);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), specularPower);
-    float3 specular = specularIntensity * spec * light.diffuseColor * att;
+    float specAngle = saturate(dot(viewDir, reflectDir));
+    float spec = pow(specAngle, specularPower);
+    
+    float viewFactor = saturate(dot(n, viewDir));
+    float3 specular = specularIntensity * spec * light.diffuseColor * att * viewFactor;
     
     return diffuse + specular + light.ambient;
 }
@@ -50,20 +53,21 @@ float4 main(float3 worldPos : Position, float3 n : Normal) : SV_Target
     for (int i = 0; i < 1; i++)
     {
         float3 lightDir;
+        float att = 1.0f;
 
         if (lights[i].lightType == 0) // 点光源
         {
             float3 vToL = lights[i].lightPos - worldPos;
             float distToL = length(vToL);
             lightDir = vToL / distToL;
-            float att = 1.0f / (lights[i].attConst + lights[i].attLin * distToL + lights[i].attQuad * (distToL * distToL));
-            finalColor += ComputeLight(lightDir, att, n, lights[i], worldPos);
+            att = 1.0f / (lights[i].attConst + lights[i].attLin * distToL + lights[i].attQuad * (distToL * distToL));
         }
         else if (lights[i].lightType == 1) // 定向光
         {
             lightDir = normalize(lights[i].lightPos);
-            finalColor += ComputeLight(lightDir, 1.0f, n, lights[i], worldPos);
         }
+        
+        finalColor += ComputeLight(lightDir, 1.0f, n, lights[i], worldPos);
     }
     
     return float4(saturate(finalColor * materialColor), 1.0f);

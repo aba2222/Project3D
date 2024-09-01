@@ -2,6 +2,18 @@
 #define SwapByte(x) (x << 8) | ((x >> 8) & 0xFF)
 #define DistFloor(x) (x - x % MAX_LOAD_DIST)
 
+DirectX::XMFLOAT3 CalculateTriangleNormal(const DirectX::XMFLOAT3& p0, const DirectX::XMFLOAT3& p1, const DirectX::XMFLOAT3& p2) {
+    DirectX::XMVECTOR v0 = DirectX::XMLoadFloat3(&p0);
+    DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&p1);
+    DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&p2);
+    DirectX::XMVECTOR normal = DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0), DirectX::XMVectorSubtract(v2, v0));
+    normal = DirectX::XMVector3Normalize(normal);
+
+    DirectX::XMFLOAT3 normalFloat3;
+    DirectX::XMStoreFloat3(&normalFloat3, normal);
+    return normalFloat3;
+}
+
 Terrain::Terrain(AppBlock& appBlock, const std::string& heightmapFile, Camera& cam)
     : ManagerBase(appBlock) {
 }
@@ -9,8 +21,8 @@ Terrain::Terrain(AppBlock& appBlock, const std::string& heightmapFile, Camera& c
 void TerrainChunk::CreateMesh(int chunkSize, float spacing) {
     LoadFile((pos->longitude - 121) * 3600, (pos->latitude - 29) * 3600, "Scenery\\N29E121.hgt", MAX_LOAD_DIST / 30);
     int vertexCount = (chunkSize + 1) * (chunkSize + 1);
-    for (int i = 0; i <= chunkSize; ++i) {
-        for (int j = 0; j <= chunkSize; ++j) {
+    for (int i = 0; i < chunkSize; ++i) {
+        for (int j = 0; j < chunkSize; ++j) {
             float x = j * spacing;
             float z = i * spacing;
 
@@ -40,36 +52,24 @@ void TerrainChunk::CreateMesh(int chunkSize, float spacing) {
             indices.push_back(bottomLeft);
             indices.push_back(bottomRight);
 
-            DirectX::XMVECTOR v0 = DirectX::XMLoadFloat3(&vertices[topLeft].pos);
-            DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vertices[bottomLeft].pos);
-            DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&vertices[topRight].pos);
-            DirectX::XMVECTOR normal1 = DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0), DirectX::XMVectorSubtract(v2, v0));
+            DirectX::XMFLOAT3 normal1 = CalculateTriangleNormal(vertices[topLeft].pos, vertices[bottomLeft].pos, vertices[topRight].pos);
+            DirectX::XMFLOAT3 normal2 = CalculateTriangleNormal(vertices[topRight].pos, vertices[bottomLeft].pos, vertices[bottomRight].pos);
 
-            v0 = DirectX::XMLoadFloat3(&vertices[topRight].pos);
-            v1 = DirectX::XMLoadFloat3(&vertices[bottomLeft].pos);
-            v2 = DirectX::XMLoadFloat3(&vertices[bottomRight].pos);
-            DirectX::XMVECTOR normal2 = DirectX::XMVector3Cross(DirectX::XMVectorSubtract(v1, v0), DirectX::XMVectorSubtract(v2, v0));
+            vertices[topLeft].normal.x += normal1.x + normal2.x;
+            vertices[topLeft].normal.y += normal1.y + normal2.y;
+            vertices[topLeft].normal.z += normal1.z + normal2.z;
 
-            normal1 = DirectX::XMVectorAdd(normal1, normal2);
+            vertices[bottomLeft].normal.x += normal1.x + normal2.x;
+            vertices[bottomLeft].normal.y += normal1.y + normal2.y;
+            vertices[bottomLeft].normal.z += normal1.z + normal2.z;
 
-            DirectX::XMFLOAT3 normalFloat3;
-            DirectX::XMStoreFloat3(&normalFloat3, normal1);
+            vertices[topRight].normal.x += normal1.x + normal2.x;
+            vertices[topRight].normal.y += normal1.y + normal2.y;
+            vertices[topRight].normal.z += normal1.z + normal2.z;
 
-            vertices[topLeft].normal.x += normalFloat3.x;
-            vertices[topLeft].normal.y += normalFloat3.y;
-            vertices[topLeft].normal.z += normalFloat3.z;
-
-            vertices[bottomLeft].normal.x += normalFloat3.x;
-            vertices[bottomLeft].normal.y += normalFloat3.y;
-            vertices[bottomLeft].normal.z += normalFloat3.z;
-
-            vertices[topRight].normal.x += normalFloat3.x;
-            vertices[topRight].normal.y += normalFloat3.y;
-            vertices[topRight].normal.z += normalFloat3.z;
-
-            vertices[bottomRight].normal.x += normalFloat3.x;
-            vertices[bottomRight].normal.y += normalFloat3.y;
-            vertices[bottomRight].normal.z += normalFloat3.z;
+            vertices[bottomRight].normal.x += normal2.x;
+            vertices[bottomRight].normal.y += normal2.y;
+            vertices[bottomRight].normal.z += normal2.z;
         }
     }
     for (auto& vertex : vertices) {
@@ -78,9 +78,7 @@ void TerrainChunk::CreateMesh(int chunkSize, float spacing) {
         DirectX::XMStoreFloat3(&vertex.normal, normal);
     }
 
-    // Create vertex buffer
     AddBind(std::make_unique<VertexBuffer>(appBlock.gfx, vertices));
-    // Create index buffer
     AddIndexBuffer(std::make_unique<IndexBuffer>(appBlock.gfx, indices));
 
     auto pvs = std::make_unique<VertexShader>(appBlock.gfx, L"PhongVS.cso");
@@ -98,7 +96,7 @@ void TerrainChunk::CreateMesh(int chunkSize, float spacing) {
     struct PSMaterialConstant {
         DirectX::XMFLOAT3 color;
         float specularIntensity = 0.6f;
-        float specularPower = 30.0f;
+        float specularPower = 32.0f;
         float padding[3];
     } pmc;
     pmc.color = { 1.0f,1.0f,1.0f };
@@ -154,6 +152,7 @@ void TerrainChunk::LoadFile(int startX, int startY, const std::string& heightmap
             heightMap[y][x] = SwapByte(heightMap[y][x]);
         }
     }
+    infile.close();
 }
 
 void Terrain::Update() {

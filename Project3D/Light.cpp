@@ -37,8 +37,9 @@ void Light::SpawnControlWindow() noexcept {
 }
 
 void Light::Reset() noexcept {
+	lights.clear();
 	lights.push_back({
-		{ 0.0f,8.0f,0.0f } , 0.0f,
+		{ 0.0f,1.0f,0.0f } , 0.0f,
 		{ 0.05f,0.05f,0.05f }, 0.0f,
 		{ 1.0f,1.0f,1.0f }, 0.0f,
 		0.6f,
