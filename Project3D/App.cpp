@@ -9,7 +9,7 @@
 App::App()
 	: wnd(800, 600, "3D Box"),
 	  light(wnd.Gfx(), 1),
-	  terr(wnd.Gfx(), "Scenery\\N29E121.hgt", cam){
+	  terr(appBlock, "Scenery\\N29E121.hgt", cam){
 	#ifdef FSP_COUNT
 	fsp = 0;
 	#endif // FSP_COUNT;
@@ -41,6 +41,7 @@ void App::DoFrame() {
 	light.Bind(wnd.Gfx(), cam.GetMatrix());
 	light.Update(0.0f);
 	testObj->Update(0.0f);
+	terr.Update();
 
 	for (auto& d : updatables) {
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);

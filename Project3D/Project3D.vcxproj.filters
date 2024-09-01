@@ -341,6 +341,9 @@
     <ClInclude Include="Updatable.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ManagerBase.h">
+      <Filter>头文件\GraphicsBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

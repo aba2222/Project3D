@@ -29,6 +29,7 @@ private:
 	ProTimer timer;
 	Camera cam;
 	Light light;
+	AppBlock appBlock = {wnd.Gfx(), cam, 800, 600};
 	std::vector<std::unique_ptr<Updatable>> updatables;
 	static constexpr size_t nDrawbles = 180;
 	Terrain terr;

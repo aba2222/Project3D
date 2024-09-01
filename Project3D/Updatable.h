@@ -7,7 +7,7 @@ public:
 	Updatable() = default;
 	Updatable(const Updatable&) = delete;
 	virtual void Update(float dt) noexcept = 0;
-	std::unique_ptr<EarthPos> GetEarthPos() noexcept { return std::move(pos); }
+	EarthPos* GetEarthPos() noexcept { return pos.get(); }
 
 protected:
 	std::unique_ptr<EarthPos> pos;

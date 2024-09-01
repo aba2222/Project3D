@@ -237,6 +237,7 @@
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="ManagerBase.h" />
     <ClInclude Include="Math3D.h" />
     <ClInclude Include="Melon.h" />
     <ClInclude Include="Mouse.h" />

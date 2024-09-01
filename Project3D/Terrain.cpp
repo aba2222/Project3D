@@ -1,47 +1,13 @@
 #include "Terrain.h"
 #define SwapByte(x) (x << 8) | ((x >> 8) & 0xFF)
+#define DistFloor(x) (x - x % MAX_LOAD_DIST)
 
-std::unique_ptr<Camera> TerrainChunk::cam = nullptr;
-
-Terrain::Terrain(Graphics& gfx, const std::string& heightmapFile, Camera& cam) 
-    : cam(cam),
-      gfx(gfx) {
-    //LoadHeightmap(heightmapFile);
+Terrain::Terrain(AppBlock& appBlock, const std::string& heightmapFile, Camera& cam)
+    : ManagerBase(appBlock) {
 }
 
-void Terrain::LoadHeightmap(const std::string& heightmapFile) {
-    std::ifstream file(heightmapFile, std::ios::binary);
-    if (!file.is_open()) { throw ExceptionHandle(__LINE__, __FILE__); }
-
-    file.seekg(0, std::ios::end);
-    std::streamsize fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    int dimension;
-    if (fileSize == 1201 * 1201 * sizeof(int16_t)) { dimension = 1201; }
-    else if (fileSize == 3601 * 3601 * sizeof(int16_t)) { dimension = 3601; }
-    else { throw ExceptionHandle(__LINE__, __FILE__); }
-
-    //heightmap.resize(dimension, std::vector<float>(dimension));
-
-    for (int i = 0; i < dimension; ++i) {
-        for (int j = 0; j < dimension; ++j) {
-            int16_t height;
-            file.read(reinterpret_cast<char*>(&height), sizeof(int16_t));
-            if (!file) { throw ExceptionHandle(__LINE__, __FILE__); }
-            // Correct the byte order
-            height = static_cast<int16_t>(SwapByte(static_cast<uint16_t>(height)));
-
-            if (height == -32768) {
-                height = 0; // Handle voids in SRTM data
-            }
-            //heightmap[i][j] = static_cast<float>(height);
-        }
-    }
-    file.close();
-}
-
-void TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& heightmap, int chunkSize, float spacing) {
+void TerrainChunk::CreateMesh(int chunkSize, float spacing) {
+    LoadFile((pos->longitude - 121) * 3600, (pos->latitude - 29) * 3600, "Scenery\\N29E121.hgt", MAX_LOAD_DIST / 30);
     int vertexCount = (chunkSize + 1) * (chunkSize + 1);
     for (int i = 0; i <= chunkSize; ++i) {
         for (int j = 0; j <= chunkSize; ++j) {
@@ -49,7 +15,7 @@ void TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& heightmap, 
             float z = i * spacing;
 
             Vertex vertex;
-            vertex.pos = DirectX::XMFLOAT3(x, heightmap[i][j], z);
+            vertex.pos = DirectX::XMFLOAT3(x, heightMap[i][j], z);
             vertex.normal = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
             vertices.push_back(vertex);
 
@@ -113,21 +79,21 @@ void TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& heightmap, 
     }
 
     // Create vertex buffer
-    AddBind(std::make_unique<VertexBuffer>(gfx, vertices));
+    AddBind(std::make_unique<VertexBuffer>(appBlock.gfx, vertices));
     // Create index buffer
-    AddIndexBuffer(std::make_unique<IndexBuffer>(gfx, indices));
+    AddIndexBuffer(std::make_unique<IndexBuffer>(appBlock.gfx, indices));
 
-    auto pvs = std::make_unique<VertexShader>(gfx, L"PhongVS.cso");
+    auto pvs = std::make_unique<VertexShader>(appBlock.gfx, L"PhongVS.cso");
     auto pvsbc = pvs->GetByteCode();
     AddBind(std::move(pvs));
-    AddBind(std::make_unique<PixelShader>(gfx, L"PhongPS.cso"));
+    AddBind(std::make_unique<PixelShader>(appBlock.gfx, L"PhongPS.cso"));
 
     const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
         {"Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
         {"Normal",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0},
     };
-    AddBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
-    AddBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+    AddBind(std::make_unique<InputLayout>(appBlock.gfx, ied, pvsbc));
+    AddBind(std::make_unique<Topology>(appBlock.gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
     struct PSMaterialConstant {
         DirectX::XMFLOAT3 color;
@@ -136,44 +102,82 @@ void TerrainChunk::CreateMesh(const std::vector<std::vector<float>>& heightmap, 
         float padding[3];
     } pmc;
     pmc.color = { 1.0f,1.0f,1.0f };
-    AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+    AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(appBlock.gfx, pmc, 1u));
 
-    AddBind(std::make_unique<TransformCbuf>(gfx, *this));
+    AddBind(std::make_unique<TransformCbuf>(appBlock.gfx, *this));
 }
 
-TerrainChunk::TerrainChunk(Graphics& gfx, const std::string& heightmapFile, std::unique_ptr<Camera> cam)
-    : gfx(gfx) {
-    if (!cam) {
-        cam = std::move(cam);
-    }
+TerrainChunk::TerrainChunk(float startPosLon, float stratPosLat, AppBlock& appBlock)
+    : appBlock(appBlock) {
+    pos = std::make_unique<EarthPos>(startPosLon, stratPosLat, 0, 0, 0, 0);
 }
 
 DirectX::XMMATRIX TerrainChunk::GetTransformXM() const noexcept {
-    return DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+    auto localPos = appBlock.cam.GetEarthPos()->ToLocal(pos->longitude, pos->latitude, pos->altitude);
+    return DirectX::XMMatrixTranslation(localPos.x, localPos.y, localPos.z);
 }
 
 void TerrainChunk::Update(float dt) noexcept {
-    // 获取相对于 Cam 的平移矩阵
-    std::unique_ptr<EarthPos> nowPos = cam->GetEarthPos();
-    localPos = nowPos->ToLocal((GetEarthPos()));
-    if (localPos.x > MAX_LOAD_DIST || localPos.y > MAX_LOAD_DIST || localPos.z > MAX_LOAD_DIST) {;
-        delete this;
-    }
-    Draw(gfx);
+    Draw(appBlock.gfx);
 }
 
-void Terrain::Update(float dt) noexcept {
-    /*std::unique_ptr<EarthPos> nowPos = cam.GetEarthPos();
-    bool haveChunk = 0;
-    for (auto a = activeChunks.begin(); a != activeChunks.end(); a++) {
-        if ((*a)->GetEarthPos()->longitude == newChunkPos.x && (*a)->GetEarthPos()->latitude == newChunkPos.z) {
-            haveChunk = 1;
+void TerrainChunk::LoadFile(int startX, int startY, const std::string& heightmapFile, int size) {
+    infile.open(heightmapFile, std::ios::binary);
+    if (!infile) { throw std::runtime_error("Faild in Open: " + heightmapFile); }
+    int gridSize = 3601; 
+
+    if (startX < 0 || startY < 0 || size <= 0 || startX + size > gridSize || startY + size > gridSize) {
+        throw std::out_of_range("Requested area exceeds grid range");
+    }
+
+    heightMap.resize(size);
+    for (int y = 0; y < size; ++y) {
+        heightMap[y].resize(size);
+    }
+
+    const std::streamsize bytesPerRow = gridSize * sizeof(int16_t);
+    const std::streamsize bytesToRead = size * sizeof(int16_t);
+
+    for (int y = 0; y < size; ++y) {
+        std::streampos offset = static_cast<std::streampos>((startY + y) * gridSize + startX) * sizeof(int16_t);
+        infile.seekg(offset, std::ios::beg);
+        if (!infile) {
+            throw std::runtime_error("Seekg failed，spacing: " + std::to_string(offset));
+        }
+
+        infile.read(reinterpret_cast<char*>(heightMap[y].data()), bytesToRead);
+        if (infile.gcount() != bytesToRead) {
+            throw std::runtime_error("Read data failed，expected number of bytes read: " + std::to_string(bytesToRead));
+        }
+
+        for (int x = 0; x < size; ++x) {
+            heightMap[y][x] = SwapByte(heightMap[y][x]);
         }
     }
+}
+
+void Terrain::Update() {
+    EarthPos* nowPos = appBlock.cam.GetEarthPos();
+    bool haveChunk = 0;
+    for (auto a = classList.begin(); a != classList.end();) {
+        DirectX::XMFLOAT3 localPos = nowPos->ToLocal((*a)->GetEarthPos());
+        if (localPos.x > MAX_LOAD_DIST  * 10|| localPos.y > MAX_LOAD_DIST * 10 || localPos.z > MAX_LOAD_DIST * 10) {
+            a->release();
+            a = classList.erase(a);
+            continue;
+        }
+        if ((*a)->GetEarthPos()->longitude == nowPos->longitude - fmod(nowPos->longitude, MAX_LOAD_DIST_LON) &&
+            (*a)->GetEarthPos()->latitude == nowPos->latitude - fmod(nowPos->latitude, MAX_LOAD_DIST_LON)) {
+            haveChunk = 1;
+        }
+        (*a)->Draw(appBlock.gfx);
+
+        a++;
+    }
     if (haveChunk == 1) return;
-    auto newChunk = std::make_unique<TerrainChunk>(gfx, "Scenery\\N29E121.hgt", std::make_unique<Camera>(cam));
-    newChunk->chunkPos = newChunkPos;
-    newChunk->CreateMesh(heightmap, CHUNK_SIZE, spacing);
-    activeChunks.insert(activeChunks.begin(), std::move(newChunk));
-    return;*/
+    auto newChunk = std::make_unique<TerrainChunk>(nowPos->longitude - fmod(nowPos->longitude, MAX_LOAD_DIST_LON),
+                                                   nowPos->latitude - fmod(nowPos->latitude, MAX_LOAD_DIST_LON), appBlock);
+    newChunk->CreateMesh(CHUNK_SIZE, spacing);
+    classList.insert(classList.begin(), std::move(newChunk));
+    return;
 }

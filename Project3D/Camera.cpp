@@ -40,13 +40,13 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix(float aspectRatio) const noexcept 
 void Camera::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Camera")) {
 		ImGui::Text("Position");
-		ImGui::SliderFloat("lat", &pos->latitude, 28.51f, 30.33f);
-		ImGui::SliderFloat("lon", &pos->longitude, 120.55f, 120.16f);
-		ImGui::SliderFloat("alt", &pos->altitude, 0, 1000);
+		ImGui::SliderFloat("lat", &(pos->latitude), 29.00f, 29.95f);
+		ImGui::SliderFloat("lon", &(pos->longitude), 121.00f, 121.95f);
+		ImGui::SliderFloat("alt", &(pos->altitude), 0, 1000);
 		ImGui::Text("Orientation");
-		ImGui::SliderAngle("Roll", &pos->roll, -180.0f, 180.0f);
-		ImGui::SliderAngle("Pitch", &pos->pitch, -180.0f, 180.0f);
-		ImGui::SliderAngle("Yaw", &pos->yaw, -180.0f, 180.0f);
+		ImGui::SliderAngle("Roll", &(pos->roll), -180.0f, 180.0f);
+		ImGui::SliderAngle("Pitch", &(pos->pitch), -180.0f, 180.0f);
+		ImGui::SliderAngle("Yaw", &(pos->yaw), -180.0f, 180.0f);
 		if (ImGui::Button("Reset")) {
 			Reset();
 		}

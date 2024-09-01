@@ -3,6 +3,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <DirectXMath.h>
+#include "ManagerBase.h"
 #include <memory>
 #include "ExceptionHandle.h"
 #include "Graphics.h"
@@ -10,16 +11,18 @@
 #include "TransformCbuf.h"
 #include "DrawableBase.h"
 #include "Camera.h"
-#define MAX_LOAD_DIST 300
+#define MAX_LOAD_DIST 3000
+#define MAX_LOAD_DIST_LON 0.00027777777f
 #define REBUILD_THRESHOLD 30
 #define CHUNK_SIZE 30
 
 class TerrainChunk : public DrawableBase<TerrainChunk> {
 public:
-	TerrainChunk(Graphics& gfx, const std::string& heightmapFile, std::unique_ptr<Camera> cam);
+	TerrainChunk(float startPosLon ,float stratPosLat, AppBlock& appBlock);
 	DirectX::XMMATRIX GetTransformXM() const noexcept;
 	void Update(float dt) noexcept;
-	void CreateMesh(const std::vector<std::vector<float>>& heightmap, int chunkSize, float spacing);
+	void LoadFile(int startX, int startY, const std::string& heightmapFile, int size);
+	void CreateMesh( int chunkSize, float spacing);
 
 	struct pair_hash {
 		template <class T1, class T2>
@@ -29,31 +32,28 @@ public:
 	};
 
 protected:
-	static std::unique_ptr<Camera> cam;
+	std::ifstream infile;
+	std::vector<std::vector<uint16_t>> heightMap;
 	struct Vertex {
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 normal;
 	};
 	DirectX::XMFLOAT3 localPos;
-	Graphics& gfx;
+	AppBlock& appBlock;
 	std::unordered_map<std::pair<int, int>, int, pair_hash> vertexIndexMap;
 	std::vector<Vertex> vertices;
 	std::vector<unsigned short> indices;
 };
 
-class Terrain {
+class Terrain : public ManagerBase<TerrainChunk> {
 friend class TerrainChunk;
 public:
-	Terrain(Graphics& gfx, const std::string& heightmapFile, Camera& cam);
-	void LoadHeightmap(const std::string& heightmapFile);
-	void Update(float dt) noexcept;
+	Terrain(AppBlock& appBlock, const std::string& heightmapFile, Camera& cam);
+	void Update();
 
 private:
 	float spacing = 30.0f;
-	Graphics& gfx;
-	Camera& cam;
 	float lastCamLat;
 	float lastCamLon;
 	float lastCamAtt;
-	std::list<std::unique_ptr<TerrainChunk>> activeChunks;
 };	

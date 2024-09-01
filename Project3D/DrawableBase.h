@@ -3,8 +3,7 @@
 #include "IndexBuffer.h"
 
 template<class T>
-class DrawableBase : public Drawable
-{
+class DrawableBase : public Drawable {
 protected:
 	static bool IsStaticInitialized() noexcept
 	{
