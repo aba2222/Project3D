@@ -14,6 +14,7 @@ App::App()
 	fsp = 0;
 	#endif // FSP_COUNT;
 	testObj = std::make_unique<SimObjectBase>(wnd.Gfx(), wnd.kbd, "test", 122.6, 78000);
+	cam.SetFocus(testObj.get());
 }
 
 int App::Go() {

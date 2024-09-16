@@ -1,6 +1,7 @@
 #include "ObjForces.h"
+#include "SimObjectBase.h"
 
-ObjForces::ObjForces(float S, int m) 
+ObjForces::ObjForces(float S, int m, SimObjectBase* obj)
 	: S(S),
 	  m(m),
 	  p(1.225f),
@@ -9,7 +10,8 @@ ObjForces::ObjForces(float S, int m)
 	  dt(0.01667f),
 	  e(0.825f),
 	  AR(pow(34.1,2)/S),
-	  ru(0.02f) {
+	  ru(0.02f),
+	  obj(obj) {
 }
 
 void ObjForces::Update() {
@@ -51,6 +53,8 @@ void ObjForces::Update() {
 	}
 
 	V += acceleration.x * dt;  // 更新速度
+
+	obj->GetEarthPos()->UpdateLatLon(V, V_Y, 0, dt);
 }
 
 void ObjForces::SetMass(int mass) { m = mass; }

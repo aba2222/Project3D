@@ -2,10 +2,11 @@
 #include <math.h>
 #include <DirectXMath.h>
 #include "Math3D.h"
+class SimObjectBase;
 
 class ObjForces {
 public:
-	ObjForces(float S, int m);
+	ObjForces(float S, int m, SimObjectBase* obj);
 	ObjForces(const ObjForces&) = delete;
 	ObjForces& operator=(const ObjForces&) = delete;
 	void Update();
@@ -29,10 +30,11 @@ private:
 	};
 	DirectX::XMFLOAT3 acceleration = { 0,0,0 };
 
+	SimObjectBase* obj;
 	Forces forces = { 0,0,0,0 };
 	float thrustX = 0; // 推力在x轴上的分量
 	float thrustY = 0; // 推力在y轴上的分量
-	float CL = 2;
+	float CL = 0.6;
 	//TODO:
 	float CD0 = 0.01;
 	//m/s^2

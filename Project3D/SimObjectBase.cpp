@@ -4,11 +4,11 @@
 
 SimObjectBase::SimObjectBase(Graphics& gfx, Keyboard& keyBoard, std::string name, float S, int m)
 	: name(name),
-	 forces(S, m),
+	 forces(S, m, this),
 	 id(0),
      kbd(keyBoard),
 	 gfx(gfx) {
-	pos = std::make_unique<EarthPos>(DSMTD(121.0f, 27.8f, 0.0f), DSMTD(29.0f, 49.6f, 00.0f), 90.0f, 0.0f, 0.0f, 0.0f);
+	pos = std::make_unique<EarthPos>(DSMTD(121.0f, 27.8f, 0.0f), DSMTD(29.0f, 49.6f, 00.0f), 500.0f, 0.0f, 0.0f, 0.0f);
 	model = std::make_unique<AssModel>(gfx, "Models\\320.obj", DirectX::XMFLOAT3{ 1,1,1 },1.0f);
 	std::vector<EngineControl::Engine> engVec;
 	engVec.push_back({ 564,2,120000 ,0 });

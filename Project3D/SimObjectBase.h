@@ -6,12 +6,12 @@
 #include "ControlBase.h"
 #include "Graphics.h"
 #include "Keyboard.h"
-#include "ObjForces.h"
 #include "EarthPos.h"
 #include "AssModel.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
+#include "ObjForces.h"
 
 class SimObjectBase : public Updatable {
 public:

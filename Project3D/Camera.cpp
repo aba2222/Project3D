@@ -5,6 +5,12 @@ Camera::Camera() {
 }
 
 DirectX::XMMATRIX Camera::GetMatrix() const noexcept {
+	if (focus != nullptr) {
+		pos->latitude = focus->GetEarthPos()->latitude;
+		pos->longitude = focus->GetEarthPos()->longitude;
+		pos->altitude = focus->GetEarthPos()->altitude;
+	}
+
 	// 定义相机位置向量
 	const auto pos_t = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -33,9 +39,9 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix(float aspectRatio) const noexcept 
 	DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f);
 }
 
-/*DirectX::XMFLOAT3 Camera::GetPos() const noexcept {
-	return DirectX::XMFLOAT3(x, y, z);
-}*/
+void Camera::SetFocus(SimObjectBase* newF) {
+	focus = newF;
+}
 
 void Camera::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Camera")) {
