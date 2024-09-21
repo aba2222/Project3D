@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #include <DirectXMath.h>
+#include <fstream>
 #include "Math3D.h"
 class SimObjectBase;
 
@@ -8,6 +9,7 @@ class ObjForces {
 public:
 	ObjForces(float S, int m, SimObjectBase* obj);
 	ObjForces(const ObjForces&) = delete;
+	~ObjForces();
 	ObjForces& operator=(const ObjForces&) = delete;
 	void Update();
 	void SetMass(int mass);
@@ -23,10 +25,10 @@ private:
 	struct Forces {
 		//Unit:N
 		float thrust;
-		float lift;
-		float drag;
+		double lift;
+		double drag;
 		float weight;
-		float friction;
+		double friction;
 	};
 	DirectX::XMFLOAT3 acceleration = { 0,0,0 };
 
@@ -34,14 +36,13 @@ private:
 	Forces forces = { 0,0,0,0 };
 	float thrustX = 0; // 推力在x轴上的分量
 	float thrustY = 0; // 推力在y轴上的分量
-	float CL = 0.6;
-	//TODO:
-	float CD0 = 0.01;
+	double CL = 0.6;
+	double CD0 = 0.01;
 	//m/s^2
 	const float g = 9.81f;
 	//m/s
-	float V = 0;
-	float V_Y = 0;
+	double V = 0;
+	double V_Y = 0;
 	//m^2
 	float S;
 	//kg/m^3
@@ -60,4 +61,6 @@ private:
 	float AR;
 	//滚动摩擦系数
 	float ru;
+
+	std::ifstream file;
 };

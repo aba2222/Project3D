@@ -165,8 +165,8 @@ void Terrain::Update() {
             a = classList.erase(a);
             continue;
         }
-        if ((*a)->GetEarthPos()->longitude == nowPos->longitude - fmod(nowPos->longitude, MAX_LOAD_DIST_LON) &&
-            (*a)->GetEarthPos()->latitude == nowPos->latitude - fmod(nowPos->latitude, MAX_LOAD_DIST_LON)) {
+        if ((*a)->GetEarthPos()->longitude == (float)(nowPos->longitude) - fmod((float)(nowPos->longitude), MAX_LOAD_DIST_LON) &&
+            (*a)->GetEarthPos()->latitude == (float)(nowPos->latitude) - fmod((float)(nowPos->latitude), MAX_LOAD_DIST_LON)) {
             haveChunk = 1;
         }
         (*a)->Draw(appBlock.gfx);
@@ -174,8 +174,8 @@ void Terrain::Update() {
         a++;
     }
     if (haveChunk == 1) return;
-    auto newChunk = std::make_unique<TerrainChunk>(nowPos->longitude - fmod(nowPos->longitude, MAX_LOAD_DIST_LON),
-                                                   nowPos->latitude - fmod(nowPos->latitude, MAX_LOAD_DIST_LON), appBlock);
+    auto newChunk = std::make_unique<TerrainChunk>((float)(nowPos->longitude) - fmod((float)(nowPos->longitude), MAX_LOAD_DIST_LON),
+                                                   (float)(nowPos->latitude) - fmod((float)(nowPos->latitude), MAX_LOAD_DIST_LON), appBlock);
     newChunk->CreateMesh(CHUNK_SIZE, spacing);
     classList.insert(classList.begin(), std::move(newChunk));
     return;

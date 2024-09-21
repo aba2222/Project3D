@@ -45,10 +45,6 @@ void Camera::SetFocus(SimObjectBase* newF) {
 
 void Camera::SpawnControlWindow() noexcept {
 	if (ImGui::Begin("Camera")) {
-		ImGui::Text("Position");
-		ImGui::SliderFloat("lat", &(pos->latitude), 29.80f, 29.95f);
-		ImGui::SliderFloat("lon", &(pos->longitude), 121.40f, 121.55f);
-		ImGui::SliderFloat("alt", &(pos->altitude), 0, 1000);
 		ImGui::Text("Orientation");
 		ImGui::SliderAngle("Roll", &(pos->roll), -180.0f, 180.0f);
 		ImGui::SliderAngle("Pitch", &(pos->pitch), -180.0f, 180.0f);

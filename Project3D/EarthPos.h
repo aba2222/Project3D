@@ -10,9 +10,9 @@ public:
         : longitude(lon), latitude(lat), altitude(alt),
         yaw(yaw), pitch(pch), roll(rll) {}
 
-    float longitude;
-    float latitude;
-    float altitude;
+    double longitude;
+    double latitude;
+    double altitude;
 
     float roll;
     float pitch;
@@ -51,8 +51,8 @@ public:
         return DirectX::XMFLOAT3(x, y, z);
     }
 
-    void UpdateLatLon(float vx_local, float vy_local, float vz_local, float dt) {
-        float vx_global, vy_global, vz_global;
+    void UpdateLatLon(double vx_local, double vy_local, double vz_local, float dt) {
+        double vx_global, vy_global, vz_global;
 
         double cosPitch = cos(pitch);
         double sinPitch = sin(pitch);

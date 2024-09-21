@@ -14,7 +14,28 @@ ObjForces::ObjForces(float S, int m, SimObjectBase* obj)
 	  obj(obj) {
 }
 
+ObjForces::~ObjForces() {
+	file.close();
+}
+
 void ObjForces::Update() {
+	file = std::ifstream("Models\\a320_jh_DegenGeom.polar", std::ios::in);
+	if (!file.is_open()) {
+		throw std::runtime_error("OpenFile Error");
+	}
+	int targetLine = 11 * 10 + 1;
+	targetLine += (int)(V / 340 * 10) * 11;
+	targetLine += 5;
+	std::string result;
+	for (int i = 1; i <= targetLine + 1; i++) {
+		std::getline(file, result);
+	}
+	std::string subStr = result.substr(69, 15);
+	CL =  std::stof(subStr);
+	subStr = result.substr(86, 15);
+	CD0 = std::stof(subStr);
+	file.close();
+
 	thrustX = forces.thrust * cos(gamma);
 	thrustY = forces.thrust * sin(gamma);
 	forces.lift = 0.5 * p * pow(V, 2) * S * CL;
@@ -23,8 +44,8 @@ void ObjForces::Update() {
 
 	// ¼ÆËã×èÁ¦
 	if (V != 0) {
-		float drag_induced = (forces.lift * forces.lift) / (0.5 * p * V * V * S * PI * e * AR);
-		float drag_parasite = 0.5 * p * V * V * S * CD0;
+		double drag_induced = (forces.lift * forces.lift) / (0.5 * p * V * V * S * PI * e * AR);
+		double drag_parasite = 0.5 * p * V * V * S * CD0;
 		forces.drag = drag_induced + drag_parasite;
 	}
 	else forces.drag = 0;

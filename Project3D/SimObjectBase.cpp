@@ -34,6 +34,8 @@ void SimObjectBase::Update(float dt) noexcept {
 
 void SimObjectBase::SpawnControlWindow() {
 	if (ImGui::Begin("SimObj")) {
+		ImGui::Text("Position");
+		ImGui::Text("Lon: %.15f \nLat: %.15f\nLat: %.1f", pos->longitude, pos->latitude, pos->latitude);
 		ImGui::Text("Name: %s   Id: %d", name.c_str(), id);
 		ImGui::Text("V_X:%.2f km/h", forces.GetVkmh());
 		ImGui::Text("V_Y:%.2f km/h", forces.GetV_Y() * 3.6);
